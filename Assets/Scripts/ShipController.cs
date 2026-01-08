@@ -4,6 +4,18 @@ using UnityEngine.InputSystem;
 
 public class ShipController : MonoBehaviour
 {
+    [Header("Sails")]
+    public float sailTrim = 0f;           // aktuální trim (např. -1..+1)
+    public float sailTrimMax = 1f;        // rozsah trimu
+    public float sailChangePerSec = 1.5f; // jak rychle hráč nastavuje plachty
+    public PlayerInteractor sailOperator; // kdo právě ovládá plachty (null = nikdo)
+
+    [Header("Wind")]
+    public float windDirDeg = 0f;         // směr větru ve světě (0 = doprava)
+    public float windStrength = 1f;       // 0..1
+    public float windDirChangePerSec = 8f;// jak rychle se vítr mění (deg/sec) - náhodně
+    public float windStrengthChangePerSec = 0.2f; // jak rychle se mění síla
+
     
     [Header("Helm")]
     public float helm = 0f;              // aktuální nastavení kormidla
@@ -84,5 +96,35 @@ public class ShipController : MonoBehaviour
 
         helm = Mathf.MoveTowards(helm, 0f, helmReturnPerSec * dt);
     }
+    
+    public void SetSailOperator(PlayerInteractor interactor)
+    {
+        sailOperator = interactor;
+
+        var pc = interactor.GetComponent<PlayerController>();
+        if (pc != null)
+        {
+            pc.enabled = false;
+            var rb = interactor.GetComponent<Rigidbody2D>();
+            if (rb != null) rb.linearVelocity = Vector2.zero;
+        }
+    }
+
+    public void ClearSailOperator(PlayerInteractor interactor)
+    {
+        if (sailOperator != interactor) return;
+
+        var pc = interactor.GetComponent<PlayerController>();
+        if (pc != null) pc.enabled = true;
+
+        sailOperator = null;
+    }
+
+    public void UpdateSailsFromInput(float input, float dt)
+    {
+        sailTrim += input * sailChangePerSec * dt;
+        sailTrim = Mathf.Clamp(sailTrim, -sailTrimMax, sailTrimMax);
+    }
+
 
 }
