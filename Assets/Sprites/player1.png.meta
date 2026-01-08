@@ -1,10 +1,10 @@
 fileFormatVersion: 2
-guid: 5c5c99a055f03614b8de3433467c91e6
+guid: 3046b6644da051746b1c420e4f5a0cbe
 TextureImporter:
   internalIDToNameTable:
   - first:
-      213: 1993811270295497230
-    second: saillarge_0
+      213: -4398183398628465896
+    second: player1_0
   externalObjects: {}
   serializedVersion: 13
   mipmaps:
@@ -113,13 +113,13 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: saillarge_0
+      name: player1_0
       rect:
         serializedVersion: 2
-        x: 8
-        y: 4
-        width: 67
-        height: 594
+        x: 7
+        y: 0
+        width: 108
+        height: 145
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -128,8 +128,8 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: -1
       bones: []
-      spriteID: e0a222369c07bab10800000000000000
-      internalID: 1993811270295497230
+      spriteID: 813eab3608386f2c0800000000000000
+      internalID: -4398183398628465896
       vertices: []
       indices: 
       edges: []
@@ -148,7 +148,7 @@ TextureImporter:
     spriteCustomMetadata:
       entries: []
     nameFileIdTable:
-      saillarge_0: 1993811270295497230
+      player1_0: -4398183398628465896
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 
