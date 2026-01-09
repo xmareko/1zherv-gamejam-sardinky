@@ -1,123 +1,76 @@
 using UnityEngine;
-using UnityEngine.InputSystem;
-
 
 public class ShipController : MonoBehaviour
 {
+    [Header("Wind (set by WindSystem)")]
+    [Tooltip("Směr větru ve světě ve stupních. 0 = doprava, 90 = nahoru.")]
+    public float windDirDeg = 0f;
+
+    [Tooltip("Síla větru 0..1")]
+    [Range(0f, 1f)]
+    public float windStrength = 1f;
+
     [Header("Sails")]
-    public float sailTrim = 0f;           // aktuální trim (např. -1..+1)
-    public float sailTrimMax = 1f;        // rozsah trimu
-    public float sailChangePerSec = 1.5f; // jak rychle hráč nastavuje plachty
-    public PlayerInteractor sailOperator; // kdo právě ovládá plachty (null = nikdo)
+    [Tooltip("Trim plachet -1..+1 (zjednodušené).")]
+    public float sailTrim = 0f;
+    public float sailTrimMax = 1f;
+    public float sailChangePerSec = 1.5f;
+    public PlayerInteractor sailOperator; // kdo ovládá plachty
 
-    [Header("Wind")]
-    public float windDirDeg = 0f;         // směr větru ve světě (0 = doprava)
-    public float windStrength = 1f;       // 0..1
-    public float windDirChangePerSec = 8f;// jak rychle se vítr mění (deg/sec) - náhodně
-    public float windStrengthChangePerSec = 0.2f; // jak rychle se mění síla
-
-    
     [Header("Helm")]
-    public float helm = 0f;              // aktuální nastavení kormidla
-    public float helmMax = 0.5f;           // -0.5..+0.5
-    public float helmChangePerSec = 1.5f; // jak rychle hráč točí kormidlem (jednotky za vteřinu)
-    public float helmReturnPerSec = 0.2f; // kolik se samo vrací k nule (0 = nikdy)
-    public float turnPerHelmUnit = 25f;   // kolik stupňů/s udělá 1 jednotka kormidla
+    [Tooltip("Aktuální nastavení kormidla. Zůstává i když hráč odejde (pokud se necentruje).")]
+    public float helm = 0f;
+    public float helmMax = 0.5f;
+    public float helmChangePerSec = 1.5f;
+    public float helmReturnPerSec = 0.2f; // 0 = nikdy se nevrací
+    public float turnPerHelmUnit = 25f;   // deg/sec při helm=1
 
-    
     [Header("Ship State")]
-    public float headingDeg = 0f;     // kam loď míří (logicky)
-    public float speed = 2f;          // zatím konstanta, vítr přijde v dalším kroku
+    public float headingDeg = 0f; // logický kurz (pro kompas/vítr)
+    public float speed = 2f;      // aktuální rychlost (počítá WorldMover)
 
-    [Header("Turning")]
-    public float turnRateDegPerSec = 90f;
+    [Header("Runtime")]
+    public PlayerInteractor helmsman; // kdo drží kormidlo
 
-    public PlayerInteractor helmsman; // kdo právě řídí (null = nikdo)
-
+    // ---------- Helm ownership ----------
     public void SetHelmsman(PlayerInteractor interactor)
     {
         helmsman = interactor;
-
-        // zablokuj pohyb postavy
-        var pc = interactor.GetComponent<PlayerController>();
-        if (pc != null)
-        {
-            pc.enabled = false;
-
-            // jistota: zastav rychlost RB, aby "nedojel"
-            var rb = interactor.GetComponent<Rigidbody2D>();
-            if (rb != null) rb.linearVelocity = Vector2.zero;
-        }
+        DisablePlayerMove(interactor);
     }
 
     public void ClearHelmsman(PlayerInteractor interactor)
     {
-        if (helmsman != interactor)
-            return;
-
-        // povol pohyb postavy
-        var pc = interactor.GetComponent<PlayerController>();
-        if (pc != null)
-            pc.enabled = true;
-
+        if (helmsman != interactor) return;
+        EnablePlayerMove(interactor);
         helmsman = null;
     }
 
-
-    public void ApplyTurnInput(float turnInput, float dt)
+    // ---------- Sails ownership ----------
+    public void SetSailOperator(PlayerInteractor interactor)
     {
-        // turnInput -1..+1
-        headingDeg += turnInput * turnRateDegPerSec * dt;
-
-        // udržet v rozumném rozsahu
-        if (headingDeg > 180f) headingDeg -= 360f;
-        if (headingDeg < -180f) headingDeg += 360f;
+        sailOperator = interactor;
+        DisablePlayerMove(interactor);
     }
 
-    public Vector2 ForwardWorld()
+    public void ClearSailOperator(PlayerInteractor interactor)
     {
-        float rad = headingDeg * Mathf.Deg2Rad;
-        return new Vector2(Mathf.Cos(rad), Mathf.Sin(rad));
+        if (sailOperator != interactor) return;
+        EnablePlayerMove(interactor);
+        sailOperator = null;
     }
-    
+
+    // ---------- Helm & sails state updates ----------
     public void UpdateHelmFromInput(float steerInput, float dt)
     {
-        // steerInput je -1..+1 (A/D nebo šipky)
-        // přičítáme pomalu, aby to působilo jako skutečné kormidlo
         helm += steerInput * helmChangePerSec * dt;
         helm = Mathf.Clamp(helm, -helmMax, helmMax);
     }
 
     public void AutoCenterHelm(float dt)
     {
-        // pokud chceš, aby se samo vracelo k 0 (jako některé hry),
-        // nastav helmReturnPerSec > 0
         if (helmReturnPerSec <= 0f) return;
-
         helm = Mathf.MoveTowards(helm, 0f, helmReturnPerSec * dt);
-    }
-    
-    public void SetSailOperator(PlayerInteractor interactor)
-    {
-        sailOperator = interactor;
-
-        var pc = interactor.GetComponent<PlayerController>();
-        if (pc != null)
-        {
-            pc.enabled = false;
-            var rb = interactor.GetComponent<Rigidbody2D>();
-            if (rb != null) rb.linearVelocity = Vector2.zero;
-        }
-    }
-
-    public void ClearSailOperator(PlayerInteractor interactor)
-    {
-        if (sailOperator != interactor) return;
-
-        var pc = interactor.GetComponent<PlayerController>();
-        if (pc != null) pc.enabled = true;
-
-        sailOperator = null;
     }
 
     public void UpdateSailsFromInput(float input, float dt)
@@ -126,5 +79,21 @@ public class ShipController : MonoBehaviour
         sailTrim = Mathf.Clamp(sailTrim, -sailTrimMax, sailTrimMax);
     }
 
+    // ---------- helpers ----------
+    void DisablePlayerMove(PlayerInteractor interactor)
+    {
+        var pc = interactor.GetComponent<PlayerController>();
+        if (pc != null)
+        {
+            pc.enabled = false;
+            var rb = interactor.GetComponent<Rigidbody2D>();
+            if (rb != null) rb.linearVelocity = Vector2.zero;
+        }
+    }
 
+    void EnablePlayerMove(PlayerInteractor interactor)
+    {
+        var pc = interactor.GetComponent<PlayerController>();
+        if (pc != null) pc.enabled = true;
+    }
 }
