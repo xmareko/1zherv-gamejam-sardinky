@@ -34,7 +34,7 @@ public class PlayerInteractor : MonoBehaviour
 
     void OnTriggerEnter2D(Collider2D other)
     {
-        var interactable = other.GetComponent<IInteractable>();
+        var interactable = other.GetComponentInParent<IInteractable>();
         if (interactable == null) return;
 
         current = interactable;
