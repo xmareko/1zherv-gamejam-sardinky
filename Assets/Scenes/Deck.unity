@@ -510,7 +510,7 @@ Transform:
   m_GameObject: {fileID: 153870895}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 1.84, y: 0.17, z: 0}
+  m_LocalPosition: {x: 1.62, y: 0.16, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -830,7 +830,7 @@ Transform:
   m_GameObject: {fileID: 325245315}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -1.41, y: 0.26, z: 0}
+  m_LocalPosition: {x: -1.58, y: 0.2, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -4474,6 +4474,7 @@ GameObject:
   m_Component:
   - component: {fileID: 2007147525}
   - component: {fileID: 2007147526}
+  - component: {fileID: 2007147527}
   m_Layer: 0
   m_Name: steering
   m_TagString: Untagged
@@ -4490,7 +4491,7 @@ Transform:
   m_GameObject: {fileID: 2007147524}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -6.19, y: 0, z: 0}
+  m_LocalPosition: {x: -5.42, y: -0.01, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -4555,6 +4556,24 @@ SpriteRenderer:
   m_SpriteTileMode: 0
   m_WasSpriteAssigned: 1
   m_SpriteSortPoint: 0
+--- !u!114 &2007147527
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2007147524}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5bf16d31605a8444b911c52fae35fca6, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::SteeringVisual
+  ship: {fileID: 2107439602}
+  maxAngle: 40
+  smooth: 12
+  rotateLocal: 1
+  baseAngleOffset: 0
+  invert: 0
 --- !u!1 &2022158950
 GameObject:
   m_ObjectHideFlags: 0
