@@ -1,4 +1,4 @@
-using UnityEngine;
+    using UnityEngine;
 
 public class WorldController : MonoBehaviour
 {
@@ -18,8 +18,7 @@ public class WorldController : MonoBehaviour
         // Otáčej pivot kolem lodi
         worldPivot.rotation = Quaternion.Euler(0, 0, -ship.headingDeg);
 
-        // Posouvej OBSAH světa proti směru "dopředu" lodi
-        // Loď je vizuálně doprava => svět jde doleva v lokálním směru pivotu
-        worldContent.position -= worldPivot.right * (ship.speed * dt);
+        
+        worldContent.position -= Vector3.right * (ship.speed * dt);
     }
 }

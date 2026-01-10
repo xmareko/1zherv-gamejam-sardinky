@@ -7,8 +7,8 @@ public class WorldMover : MonoBehaviour
     public ShipController ship;   // ShipRoot s ShipControllerem
 
     [Header("Forward Movement")]
+    public bool useDynamicSpeed = true;
     public float forwardSpeed = 5f;  // použije se jen když useShipSpeed=false
-    public bool useShipSpeed = true;
 
     [Header("Sailing Model")]
     public float maxSpeed = 8f;
@@ -85,7 +85,7 @@ public class WorldMover : MonoBehaviour
 
     void MoveForward(float dt)
     {
-        float spd = useShipSpeed ? ship.speed : forwardSpeed;
+        float spd = useDynamicSpeed ? ship.speed : forwardSpeed;
         transform.Translate(Vector3.left * spd * dt, Space.World);
     }
 
