@@ -12,38 +12,64 @@ public class DisableWhenDamaged : MonoBehaviour
     [Header("Damage Source")]
     public DamagePoint damagePoint;
 
-    [Header("What to disable")]
-    public Collider2D[] collidersToDisable;
-    public Behaviour[] behavioursToDisable;
+    [Header("When HEALTHY (not damaged)")]
+    public Collider2D[] collidersHealthy;     // interakční triggry (helm/sails/cannon)
+    public Behaviour[] behavioursHealthy;     // HelmInteractable, SailsInteractable, ...
+
+    [Header("When DAMAGED (repair mode)")]
+    public Collider2D[] collidersDamaged;     // repair triggry (defaultně vypnuté)
+    public Behaviour[] behavioursDamaged;     // RepairPointInteractable (volitelné)
 
     [Header("Force release (kick player out)")]
     public ShipController ship;
     public ForcedReleaseMode releaseMode = ForcedReleaseMode.None;
 
-    bool wasDamaged;
+    bool lastDamaged;
+
+    void Start()
+    {
+        lastDamaged = damagePoint != null && damagePoint.isDamaged;
+        ApplyState(lastDamaged);
+    }
 
     void Update()
     {
         if (damagePoint == null) return;
 
-        bool isDamaged = damagePoint.isDamaged;
+        bool damaged = damagePoint.isDamaged;
+        if (damaged == lastDamaged) return;
 
-        // když se právě nově poškodilo -> vyhoď hráče z obsluhy
-        if (!wasDamaged && isDamaged)
-        {
+        // nově se poškodilo -> vyhoď hráče z obsluhy
+        if (damaged)
             ForceReleaseIfNeeded();
-        }
 
-        // enable/disable colliderů a skriptů
-        if (collidersToDisable != null)
-            foreach (var c in collidersToDisable)
-                if (c != null) c.enabled = !isDamaged;
+        ApplyState(damaged);
+        lastDamaged = damaged;
+    }
 
-        if (behavioursToDisable != null)
-            foreach (var b in behavioursToDisable)
-                if (b != null) b.enabled = !isDamaged;
+    void ApplyState(bool damaged)
+    {
+        // zdravé = interakce ON, opravy OFF
+        SetEnabled(collidersHealthy, !damaged);
+        SetEnabled(behavioursHealthy, !damaged);
 
-        wasDamaged = isDamaged;
+        // poškozené = opravy ON, interakce OFF
+        SetEnabled(collidersDamaged, damaged);
+        SetEnabled(behavioursDamaged, damaged);
+    }
+
+    void SetEnabled(Collider2D[] cols, bool enabled)
+    {
+        if (cols == null) return;
+        foreach (var c in cols)
+            if (c != null) c.enabled = enabled;
+    }
+
+    void SetEnabled(Behaviour[] behs, bool enabled)
+    {
+        if (behs == null) return;
+        foreach (var b in behs)
+            if (b != null) b.enabled = enabled;
     }
 
     void ForceReleaseIfNeeded()
@@ -53,13 +79,11 @@ public class DisableWhenDamaged : MonoBehaviour
         switch (releaseMode)
         {
             case ForcedReleaseMode.Helm:
-                if (ship.helmsman != null)
-                    ship.ClearHelmsman(ship.helmsman);
+                if (ship.helmsman != null) ship.ClearHelmsman(ship.helmsman);
                 break;
 
             case ForcedReleaseMode.Sails:
-                if (ship.sailOperator != null)
-                    ship.ClearSailOperator(ship.sailOperator);
+                if (ship.sailOperator != null) ship.ClearSailOperator(ship.sailOperator);
                 break;
         }
     }
