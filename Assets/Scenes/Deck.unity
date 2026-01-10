@@ -631,7 +631,7 @@ SpriteRenderer:
   m_GlobalIlluminationMeshLod: 0
   m_SortingLayerID: 0
   m_SortingLayer: 0
-  m_SortingOrder: 11
+  m_SortingOrder: 51
   m_MaskInteraction: 0
   m_Sprite: {fileID: 21300000, guid: 59862ce13050c4a4fa0717d8c97fe18a, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
@@ -1150,7 +1150,7 @@ SpriteRenderer:
   m_GlobalIlluminationMeshLod: 0
   m_SortingLayerID: 0
   m_SortingLayer: 0
-  m_SortingOrder: 11
+  m_SortingOrder: 51
   m_MaskInteraction: 0
   m_Sprite: {fileID: 21300000, guid: 5c5c99a055f03614b8de3433467c91e6, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
@@ -2043,6 +2043,7 @@ GameObject:
   - component: {fileID: 846696601}
   - component: {fileID: 846696600}
   - component: {fileID: 846696599}
+  - component: {fileID: 846696603}
   m_Layer: 0
   m_Name: WindVisual
   m_TagString: Untagged
@@ -2139,6 +2140,19 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!210 &846696603
+SortingGroup:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 846696598}
+  m_Enabled: 1
+  m_SortingLayerID: 0
+  m_SortingLayer: 0
+  m_SortingOrder: 50
+  m_SortAtRoot: 0
+  m_Sort3DAs2D: 0
 --- !u!1 &879225321
 GameObject:
   m_ObjectHideFlags: 0
@@ -2908,8 +2922,8 @@ MonoBehaviour:
   useDynamicSpeed: 1
   forwardSpeed: 5
   maxSpeed: 8
-  accel: 2.5
-  noGoZoneDeg: 35
+  accel: 1.5
+  noGoZoneDeg: 90
 --- !u!1 &1284577111
 GameObject:
   m_ObjectHideFlags: 0
@@ -5455,7 +5469,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 648e5e9a44d86a7448e9c1aa5c0e5339, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::ShipController
-  windDirDeg: 180
+  windDirDeg: 0
   windStrength: 1
   sailTrim: 0
   sailTrimMax: 1

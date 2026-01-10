@@ -12,8 +12,8 @@ public class WorldMover : MonoBehaviour
 
     [Header("Sailing Model")]
     public float maxSpeed = 8f;
-    public float accel = 2.5f;       // jak rychle loď zrychluje/brzdí
-    public float noGoZoneDeg = 35f;  // úhel proti větru, kde skoro nejede
+    public float accel = 1.5f;       // jak rychle loď zrychluje/brzdí
+    public float noGoZoneDeg = 90f;  // úhel proti větru, kde skoro nejede
 
     // Pivot: střed lodi (loď je fixně na (0,0,0))
     private readonly Vector3 pivotPoint = Vector3.zero;

@@ -25,6 +25,9 @@ public class ShipFloodingManager : MonoBehaviour
     // pamatujeme si, co bylo poškozené minulý frame (detekce nového zásahu)
     readonly Dictionary<DamagePoint, bool> lastDamaged = new Dictionary<DamagePoint, bool>();
 
+    // Prevents calling Game Over multiple times
+    private bool isSunk = false;
+
     void Awake()
     {
         if (damageManager == null)
@@ -82,6 +85,24 @@ public class ShipFloodingManager : MonoBehaviour
         }
 
         water01 = Mathf.Clamp01(water01);
+
+        // --- NEW: Check for Sinking (Game Over) ---
+        if (!isSunk && water01 >= 1f)
+        {
+            TriggerSinking();
+        }
+    }
+
+    void TriggerSinking()
+    {
+        isSunk = true;
+        Debug.Log("Ship has sunk!");
+
+        // Trigger the Game Over screen via GameManager
+        //if (GameManager.Instance != null)
+        //{
+        //    GameManager.Instance.GameOver();
+        //}
     }
 
     void OnNewDamage(DamagePoint p)

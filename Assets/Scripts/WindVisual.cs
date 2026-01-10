@@ -27,30 +27,20 @@ public class WindVisual : MonoBehaviour
     {
         if (ship == null || rend == null) return;
 
-        // 1. ROTATION (Relative to Ship)
-        // We calculate the angle of the wind relative to where the ship is facing.
-        // If Wind is 0° (Right) and Ship is 0° (Right), the visual stays at 0°.
+        // 1. Rotation matches Wind Direction relative to Ship
         float relativeAngle = ship.windDirDeg - ship.headingDeg;
-
         transform.rotation = Quaternion.Euler(0, 0, relativeAngle);
 
-        // 2. SPEED CALCULATION
+        // 2. Speed based on Wind Strength
         float currentSpeed = baseSpeed + (ship.windStrength * windMultiplier);
 
-        // 3. SCROLLING
-        // We want the wind to blow "forward" in its own local space.
-        // In Unity UVs, adding to X moves the texture LEFT. Subtracting moves RIGHT.
-        // Since 0 degrees is "Right" in Unity World space, we usually want the texture to flow towards positive X.
-        // Therefore, we SUBTRACT from the offset.
-        float offsetChange = currentSpeed * Time.deltaTime;
+        // 3. Scroll Texture (REVERSED DIRECTION)
+        Vector2 offset = rend.material.mainTextureOffset;
 
-        // We modify the X offset of the texture in Local space
-        Vector2 currentOffset = rend.material.mainTextureOffset;
-        currentOffset.x -= offsetChange;
+        // CHANGED TO PLUS (+) TO REVERSE FLOW
+        offset.x += currentSpeed * Time.deltaTime;
 
-        // Loop value to keep numbers small
-        currentOffset.x %= 1;
-
-        rend.material.mainTextureOffset = currentOffset;
+        offset.x %= 1;
+        rend.material.mainTextureOffset = offset;
     }
 }
