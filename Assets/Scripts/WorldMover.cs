@@ -45,7 +45,7 @@ public class WorldMover : MonoBehaviour
         if (ship.sailOperator != null)
         {
             float sailInput = ReadLeftRight(ship.sailOperator.isPlayerOne);
-            ship.UpdateSailsFromInput(sailInput, dt);
+            ship.UpdateSailsFromInput(-sailInput, dt);
         }
         
         // 2.5) CANNONS INPUT (jen když někdo ovládá dělo)
