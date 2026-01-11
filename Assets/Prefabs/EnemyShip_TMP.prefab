@@ -172,7 +172,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::EnemyShipAI
   shipTarget: {fileID: 0}
   shipDamageManager: {fileID: 0}
-  moveSpeed: 2
+  moveSpeed: 1
   canBeOutrun: 1
   worldMover: {fileID: 0}
   extraWorldDrag: 0
