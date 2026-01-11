@@ -11,16 +11,16 @@ public class ShipFloodingManager : MonoBehaviour
     public float water01 = 0f;
 
     [Tooltip("Kolik vody přidá okamžitě jeden nový zásah (cannon/hull/steering).")]
-    public float hitAdd = 0.08f;
+    public float hitAdd = 0.04f;
 
     [Tooltip("Extra voda za zásah do díry (HullHole).")]
-    public float hullHitExtraAdd = 0.06f;
+    public float hullHitExtraAdd = 0.05f;
 
     [Tooltip("Kolik vody přibývá za sekundu za 1 neopravenou díru v trupu.")]
-    public float leakPerHolePerSec = 0.05f;
+    public float leakPerHolePerSec = 0.03f;
 
     [Tooltip("Když nejsou žádné díry, jak rychle se voda sama ztrácí.")]
-    public float drainPerSec = 0.03f;
+    public float drainPerSec = 0.1f;
 
     // pamatujeme si, co bylo poškozené minulý frame (detekce nového zásahu)
     readonly Dictionary<DamagePoint, bool> lastDamaged = new Dictionary<DamagePoint, bool>();
