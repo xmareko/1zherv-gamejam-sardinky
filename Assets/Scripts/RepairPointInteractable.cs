@@ -21,16 +21,11 @@ public class RepairPointInteractable : MonoBehaviour, IInteractable
     {
         if (point == null) return false;
 
-        // ✅ během opravy vždy povol tomuhle hráči zrušit
+        // Allow the active repairing player to cancel
         if (repairingPlayer == interactor) return true;
 
-        // jinak musí být poškozené
         if (!point.isDamaged) return false;
-
-        // musí mít tool
         if (RepairToolPickup.toolOwner != interactor) return false;
-
-        // nesmí opravovat někdo jiný
         if (repairingPlayer != null && repairingPlayer != interactor) return false;
 
         return true;
@@ -40,14 +35,12 @@ public class RepairPointInteractable : MonoBehaviour, IInteractable
     {
         if (point == null) return;
 
-        // Toggle OFF
         if (repairingPlayer == interactor)
         {
             CancelRepair($"{interactor.name} cancelled repair");
             return;
         }
 
-        // Toggle ON
         if (!CanInteract(interactor))
         {
             Debug.Log("Can't repair (need tool / not damaged / busy)");
@@ -74,7 +67,6 @@ public class RepairPointInteractable : MonoBehaviour, IInteractable
         }
     }
 
-
     void CancelRepair(string reason)
     {
         Debug.Log(reason);
@@ -96,6 +88,7 @@ public class RepairPointInteractable : MonoBehaviour, IInteractable
         if (pc != null)
         {
             pc.enabled = !locked;
+
             var rb = player.GetComponent<Rigidbody2D>();
             if (rb != null) rb.linearVelocity = Vector2.zero;
         }

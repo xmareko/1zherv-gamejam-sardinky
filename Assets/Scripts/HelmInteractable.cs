@@ -19,7 +19,7 @@ public class HelmInteractable : MonoBehaviour, IInteractable
     {
         if (ship == null) return;
 
-        // Pokud helm drží tento hráč -> pustí
+        // Release if the same player is already helmsman
         if (ship.helmsman == interactor)
         {
             ship.ClearHelmsman(interactor);
@@ -27,21 +27,20 @@ public class HelmInteractable : MonoBehaviour, IInteractable
             return;
         }
 
-        // Pokud helm drží někdo jiný -> nejde vzít
+        // Prevent takeover by another player
         if (ship.helmsman != null && ship.helmsman != interactor)
         {
             Debug.Log("Helm is already taken!");
             return;
         }
 
-        // DŮLEŽITÉ: stejný hráč nesmí držet helm i plachty (A/D konflikt)
+        // Prevent helm + sails control conflict
         if (ship.sailOperator == interactor)
         {
             Debug.Log("You are handling SAILS. Another player must take the HELM.");
             return;
         }
 
-        // Jinak: může vzít helm, i když druhý hráč drží plachty
         ship.SetHelmsman(interactor);
         Debug.Log($"{interactor.name} took HELM");
     }

@@ -3,27 +3,27 @@ using UnityEngine;
 public class ShipController : MonoBehaviour
 {
     [Header("Wind (set by WindSystem)")]
-    [Tooltip("Směr větru ve světě ve stupních. 0 = doprava, 90 = nahoru.")]
+    // World-space wind direction in degrees (0 = right, 90 = up)
     public float windDirDeg = 0f;
 
-    [Tooltip("Síla větru 0..1")]
+    // Normalized wind strength
     [Range(0f, 1f)]
     public float windStrength = 1f;
 
     [Header("Sails")]
-    [Tooltip("Trim plachet -1..+1 (zjednodušené).")]
+    // Simplified sail trim value (-1..+1)
     public float sailTrim = 0f;
     public float sailTrimMax = 1f;
     public float sailChangePerSec = 1.5f;
-    public PlayerInteractor sailOperator; // kdo ovládá plachty
+    public PlayerInteractor sailOperator;
 
     [Header("Helm")]
-    [Tooltip("Aktuální nastavení kormidla. Zůstává i když hráč odejde (pokud se necentruje).")]
+    // Helm input persists even after player leaves
     public float helm = 0f;
     public float helmMax = 0.5f;
     public float helmChangePerSec = 1.5f;
-    public float helmReturnPerSec = 0.2f; // 0 = nikdy se nevrací
-    public float turnPerHelmUnit = 25f;   // deg/sec při helm=1
+    public float helmReturnPerSec = 0.2f;
+    public float turnPerHelmUnit = 25f;
 
     [Header("Cannons")]
     public PlayerInteractor leftCannonOperator;
@@ -33,20 +33,20 @@ public class ShipController : MonoBehaviour
     public CannonController leftCannon;
     public CannonController rightCannon;
     public CannonController frontCannon;
-    
+
     public CannonShooter leftCannonShooter;
     public CannonShooter rightCannonShooter;
     public CannonShooter frontCannonShooter;
 
-
     [Header("Ship State")]
-    public float headingDeg = 0f; // logický kurz (pro kompas/vítr)
-    public float speed = 2f;      // aktuální rychlost (počítá WorldMover)
+    // Logical heading used for navigation systems
+    public float headingDeg = 0f;
+    public float speed = 2f;
 
     [Header("Runtime")]
-    public PlayerInteractor helmsman; // kdo drží kormidlo
+    public PlayerInteractor helmsman;
 
-    // ---------- Helm ownership ----------
+    // --- Helm ownership ---
     public void SetHelmsman(PlayerInteractor interactor)
     {
         helmsman = interactor;
@@ -60,7 +60,7 @@ public class ShipController : MonoBehaviour
         helmsman = null;
     }
 
-    // ---------- Sails ownership ----------
+    // --- Sails ownership ---
     public void SetSailOperator(PlayerInteractor interactor)
     {
         sailOperator = interactor;
@@ -74,7 +74,7 @@ public class ShipController : MonoBehaviour
         sailOperator = null;
     }
 
-    // ---------- Cannons ownership ----------
+    // --- Cannons ownership ---
     public PlayerInteractor GetCannonOperator(CannonSlot slot)
     {
         switch (slot)
@@ -133,7 +133,7 @@ public class ShipController : MonoBehaviour
         }
     }
 
-    // Volitelné: když chceš hráče "odhlásit" ze všech stanovišť najednou
+    // Clears player from all stations at once
     public void ClearAllStations(PlayerInteractor interactor)
     {
         if (helmsman == interactor) ClearHelmsman(interactor);
@@ -144,7 +144,7 @@ public class ShipController : MonoBehaviour
         if (frontCannonOperator == interactor) ClearCannonOperator(CannonSlot.Front, interactor);
     }
 
-    // ---------- Helm & sails state updates ----------
+    // --- Input-driven state updates ---
     public void UpdateHelmFromInput(float steerInput, float dt)
     {
         helm += steerInput * helmChangePerSec * dt;
@@ -163,7 +163,7 @@ public class ShipController : MonoBehaviour
         sailTrim = Mathf.Clamp(sailTrim, -sailTrimMax, sailTrimMax);
     }
 
-    // ---------- helpers ----------
+    // --- Player movement locking ---
     void DisablePlayerMove(PlayerInteractor interactor)
     {
         var pc = interactor.GetComponent<PlayerController>();

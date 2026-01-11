@@ -10,23 +10,22 @@ public class ShipFloodingManager : MonoBehaviour
     [Range(0f, 1f)]
     public float water01 = 0f;
 
-    [Tooltip("Kolik vody přidá okamžitě jeden nový zásah (cannon/hull/steering).")]
+    [Tooltip("How much water is added instantly by a new hit (cannon/hull/steering).")]
     public float hitAdd = 0.04f;
 
-    [Tooltip("Extra voda za zásah do díry (HullHole).")]
+    [Tooltip("Extra water added by a hull hole hit.")]
     public float hullHitExtraAdd = 0.05f;
 
-    [Tooltip("Kolik vody přibývá za sekundu za 1 neopravenou díru v trupu.")]
+    [Tooltip("Water gained per second per unrepaired hull hole.")]
     public float leakPerHolePerSec = 0.03f;
 
-    [Tooltip("Když nejsou žádné díry, jak rychle se voda sama ztrácí.")]
+    [Tooltip("If there are no holes, how fast water drains out.")]
     public float drainPerSec = 0.1f;
 
-    // pamatujeme si, co bylo poškozené minulý frame (detekce nového zásahu)
+    // Tracks damaged state changes to detect new hits (false -> true)
     readonly Dictionary<DamagePoint, bool> lastDamaged = new Dictionary<DamagePoint, bool>();
 
-    // Prevents calling Game Over multiple times
-    private bool isSunk = false;
+    bool isSunk = false;
 
     void Awake()
     {
@@ -42,7 +41,6 @@ public class ShipFloodingManager : MonoBehaviour
     void CacheInitialStates()
     {
         lastDamaged.Clear();
-
         if (damageManager == null) return;
 
         foreach (var p in damageManager.points)
@@ -56,7 +54,6 @@ public class ShipFloodingManager : MonoBehaviour
     {
         if (damageManager == null) return;
 
-        // 1) Detekce nových zásahů (přechod false -> true)
         foreach (var p in damageManager.points)
         {
             if (p == null) continue;
@@ -65,54 +62,38 @@ public class ShipFloodingManager : MonoBehaviour
             bool now = p.isDamaged;
 
             if (!prev && now)
-            {
                 OnNewDamage(p);
-            }
 
             lastDamaged[p] = now;
         }
 
-        // 2) Průběžné zatékání podle počtu děr v trupu
         int openHoles = CountDamagedHoles();
         if (openHoles > 0)
-        {
             water01 += leakPerHolePerSec * openHoles * Time.deltaTime;
-        }
         else
-        {
-            // 3) Pokud jsou všechny díry opravené, voda pomalu mizí
             water01 -= drainPerSec * Time.deltaTime;
-        }
 
         water01 = Mathf.Clamp01(water01);
 
-        // --- NEW: Check for Sinking (Game Over) ---
         if (!isSunk && water01 >= 1f)
-        {
             TriggerSinking();
-        }
     }
 
     void TriggerSinking()
     {
         isSunk = true;
-        Debug.Log("Ship has sunk!");
 
         if (GameManager.Instance != null)
-        {
-            // Pass the specific reason here
             GameManager.Instance.GameOver("The ship has sunk into the depths!");
-        }
     }
 
     void OnNewDamage(DamagePoint p)
     {
-        // Ignorujeme plachty/stěžně (Mast)
+        // Ignore mast damage (no flooding impact)
         if (p.type == DamageType.Mast) return;
 
         float add = hitAdd;
 
-        // díra do trupu = větší problém
         if (p.type == DamageType.HullHole)
             add += hullHitExtraAdd;
 
@@ -122,11 +103,13 @@ public class ShipFloodingManager : MonoBehaviour
     int CountDamagedHoles()
     {
         int count = 0;
+
         foreach (var p in damageManager.points)
         {
             if (p == null) continue;
             if (p.type == DamageType.HullHole && p.isDamaged) count++;
         }
+
         return count;
     }
 }

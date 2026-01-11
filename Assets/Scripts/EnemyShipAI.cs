@@ -4,39 +4,41 @@ using UnityEngine;
 public class EnemyShipAI : MonoBehaviour
 {
     [Header("Target")]
-    public Transform shipTarget;                 // ShipRoot (Transform)
-    public ShipDamageManager shipDamageManager;  // ShipDamageManager na lodi
+    public Transform shipTarget;
+    public ShipDamageManager shipDamageManager;
 
     [Header("Movement")]
     public float moveSpeed = 2.5f;
 
     [Header("Behavior")]
-    [Tooltip("Když true, enemy je ovlivněný 'world drift' (můžeš mu ujet). Když false, world drift se neaplikuje (neujedeš mu).")]
+    // If false, enemy ignores world drift and will always catch up
     public bool canBeOutrun = true;
 
     [Header("World drift (used only when canBeOutrun=true)")]
-    public WorldMover worldMover;        // můžeš vyplnit v Inspectoru, jinak se najde v Start()
-    public float extraWorldDrag = 0f;    // volitelné: když chceš aby zaostával víc
+    public WorldMover worldMover;
+    public float extraWorldDrag = 0f;
 
     [Header("Hit")]
-    public bool useTriggerHit = true;    // doporučuji true
+    // Trigger is preferred to avoid physics pushing
+    public bool useTriggerHit = true;
     bool hasHit;
 
     [Header("Rotation")]
+    // Rotates sprite nose towards the ship
     public bool rotateTowardsTarget = true;
     public float spriteForwardOffsetDeg = 270f;
 
     void Start()
     {
-        // když není ručně vyplněno, zkus si to najít
+        // Auto-link damage manager from target ship
         if (shipTarget != null && shipDamageManager == null)
             shipDamageManager = shipTarget.GetComponent<ShipDamageManager>();
 
-        // worldMover potřebujeme jen když canBeOutrun=true
+        // WorldMover is only needed when enemy can be outrun
         if (canBeOutrun && worldMover == null)
             worldMover = FindFirstObjectByType<WorldMover>();
 
-        // trigger je nejjednodušší
+        // Use trigger to detect hit without physical collision response
         if (useTriggerHit)
         {
             var col = GetComponent<Collider2D>();
@@ -51,15 +53,14 @@ public class EnemyShipAI : MonoBehaviour
 
         float dt = Time.deltaTime;
 
-        // 0) Volitelně: svět se posouvá doleva podle rychlosti lodi
-        // Když canBeOutrun=false, tohle se úplně přeskočí -> enemy se bude pořád přibližovat jako dřív.
+        // Apply world drift so enemy lags behind with the moving world
         if (canBeOutrun && worldMover != null && worldMover.ship != null)
         {
             float spd = worldMover.useDynamicSpeed ? worldMover.ship.speed : worldMover.forwardSpeed;
             transform.position += Vector3.left * (spd + extraWorldDrag) * dt;
         }
 
-        // 1) Vlastní motor směrem k lodi
+        // Move directly towards the ship
         Vector3 toShip = shipTarget.position - transform.position;
         float dist = toShip.magnitude;
         if (dist < 0.0001f) return;
@@ -67,7 +68,7 @@ public class EnemyShipAI : MonoBehaviour
         Vector3 dir = toShip / dist;
         transform.position += dir * moveSpeed * dt;
 
-        // 2) Rotace špičkou na loď
+        // Face the ship visually
         if (rotateTowardsTarget)
         {
             float angle = Mathf.Atan2(dir.y, dir.x) * Mathf.Rad2Deg;
@@ -80,7 +81,8 @@ public class EnemyShipAI : MonoBehaviour
         if (!useTriggerHit) return;
         if (hasHit) return;
 
-        if (shipTarget != null && (other.transform == shipTarget || other.transform.IsChildOf(shipTarget)))
+        if (shipTarget != null &&
+            (other.transform == shipTarget || other.transform.IsChildOf(shipTarget)))
             HitShip();
     }
 
@@ -89,12 +91,14 @@ public class EnemyShipAI : MonoBehaviour
         if (useTriggerHit) return;
         if (hasHit) return;
 
-        if (shipTarget != null && (col.transform == shipTarget || col.transform.IsChildOf(shipTarget)))
+        if (shipTarget != null &&
+            (col.transform == shipTarget || col.transform.IsChildOf(shipTarget)))
             HitShip();
     }
 
     void HitShip()
     {
+        // Ensure damage is applied only once
         if (hasHit) return;
         hasHit = true;
 

@@ -4,24 +4,21 @@ public class RepairToolPickup : MonoBehaviour, IInteractable
 {
     public string Prompt => (toolOwner == null) ? "Take Repair Tool" : "Return Repair Tool";
 
-    public static PlayerInteractor toolOwner; // jen jeden hráč může mít tool
+    public static PlayerInteractor toolOwner;
 
     [Header("Visual")]
-    public GameObject toolVisual; // sprite/model toolu na zemi (volitelné)
+    public GameObject toolVisual;
 
     void Awake()
     {
-        // ať se tool vždy resetne po startu scény
+        // Reset tool state on scene start
         toolOwner = null;
         UpdateVisual();
     }
 
     public bool CanInteract(PlayerInteractor interactor)
     {
-        // může vzít, pokud nikdo nemá
         if (toolOwner == null) return true;
-
-        // může vrátit jen ten, kdo ho drží
         return toolOwner == interactor;
     }
 
@@ -29,7 +26,6 @@ public class RepairToolPickup : MonoBehaviour, IInteractable
     {
         if (toolOwner == null)
         {
-            // TAKE
             toolOwner = interactor;
             Debug.Log($"{interactor.name} took the REPAIR TOOL");
             UpdateVisual();
@@ -38,7 +34,6 @@ public class RepairToolPickup : MonoBehaviour, IInteractable
 
         if (toolOwner == interactor)
         {
-            // RETURN
             toolOwner = null;
             Debug.Log($"{interactor.name} returned the REPAIR TOOL");
             UpdateVisual();
@@ -52,9 +47,5 @@ public class RepairToolPickup : MonoBehaviour, IInteractable
     {
         if (toolVisual != null)
             toolVisual.SetActive(toolOwner == null);
-
-        // pokud nemáš toolVisual, můžeš rovnou skrývat celý objekt:
-        // gameObject.SetActive(toolOwner == null);
-        // (ale pak by nešlo tool vracet přes stejný pickup, proto je lepší toolVisual)
     }
 }

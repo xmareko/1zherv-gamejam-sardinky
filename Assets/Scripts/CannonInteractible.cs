@@ -27,7 +27,7 @@ public class CannonInteractable : MonoBehaviour, IInteractable
     {
         if (ship == null || cannon == null) return;
 
-        // když to už drží tenhle hráč -> pustí
+        // Release if the same player is already operating this cannon
         if (ship.GetCannonOperator(slot) == interactor)
         {
             ship.ClearCannonOperator(slot, interactor);
@@ -35,7 +35,7 @@ public class CannonInteractable : MonoBehaviour, IInteractable
             return;
         }
 
-        // když to drží někdo jiný -> nejde vzít
+        // Prevent takeover by another player
         var current = ship.GetCannonOperator(slot);
         if (current != null && current != interactor)
         {
@@ -43,7 +43,7 @@ public class CannonInteractable : MonoBehaviour, IInteractable
             return;
         }
 
-        // konflikty ovládání (A/D)
+        // Prevent control conflicts
         if (ship.helmsman == interactor)
         {
             Debug.Log("You are at the HELM. Another player must handle the CANNON.");
@@ -55,8 +55,7 @@ public class CannonInteractable : MonoBehaviour, IInteractable
             return;
         }
 
-        // navíc: hráč nesmí držet jiné dělo zároveň (volitelné, ale doporučuju)
-        // (tímhle zabráníš tomu, že si vezme Left a pak Front a zůstane “zaseklý”)
+        // Player cannot operate multiple cannons at once
         if (ship.leftCannonOperator == interactor ||
             ship.rightCannonOperator == interactor ||
             ship.frontCannonOperator == interactor)

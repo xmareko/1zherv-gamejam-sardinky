@@ -9,7 +9,8 @@ public class SailsInteractable : MonoBehaviour, IInteractable
     void Awake()
     {
         ship = GetComponentInParent<ShipController>();
-        if (ship == null) Debug.LogError("SailsInteractable: ShipController not found!");
+        if (ship == null)
+            Debug.LogError("SailsInteractable: ShipController not found!");
     }
 
     public bool CanInteract(PlayerInteractor interactor) => ship != null;
@@ -18,7 +19,7 @@ public class SailsInteractable : MonoBehaviour, IInteractable
     {
         if (ship == null) return;
 
-        // Když to už drží tenhle hráč -> pustí
+        // Release if the same player is already operating sails
         if (ship.sailOperator == interactor)
         {
             ship.ClearSailOperator(interactor);
@@ -26,21 +27,20 @@ public class SailsInteractable : MonoBehaviour, IInteractable
             return;
         }
 
-        // Když plachty drží někdo jiný -> nejde vzít
+        // Prevent takeover by another player
         if (ship.sailOperator != null && ship.sailOperator != interactor)
         {
             Debug.Log("Sails already taken!");
             return;
         }
 
-        // DŮLEŽITÉ: stejný hráč nesmí držet helm i plachty (A/D konflikt)
+        // Prevent helm + sails control conflict
         if (ship.helmsman == interactor)
         {
             Debug.Log("You are at the HELM. Another player must handle SAILS.");
             return;
         }
 
-        // Jinak: může vzít plachty, i když druhý hráč drží kormidlo
         ship.SetSailOperator(interactor);
         Debug.Log($"{interactor.name} took SAILS");
     }

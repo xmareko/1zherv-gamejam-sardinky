@@ -15,7 +15,7 @@ public class GameManager : MonoBehaviour
     public TextMeshProUGUI gameOverReasonText;
 
     [Header("Winner UI")]
-    public GameObject winnerPanel; // Assign the new Winner Panel here
+    public GameObject winnerPanel;
 
     [Header("Score UI")]
     public Slider distanceSlider;
@@ -28,7 +28,7 @@ public class GameManager : MonoBehaviour
     [Tooltip("Distance at which the game is won.")]
     public float winDistanceThreshold = 15f;
 
-    private bool gameEnded = false; // Prevents double triggers (Win + Die same time)
+    bool gameEnded = false;
 
     void Awake()
     {
@@ -38,11 +38,8 @@ public class GameManager : MonoBehaviour
 
     void Update()
     {
-        // Calculate distance and update slider every frame
         if (!gameEnded)
-        {
             CalculateDistanceAndCheckWin();
-        }
     }
 
     void CalculateDistanceAndCheckWin()
@@ -50,17 +47,11 @@ public class GameManager : MonoBehaviour
         float currentDistance = 0f;
 
         if (destinationTarget != null)
-        {
             currentDistance = destinationTarget.position.magnitude;
-        }
 
-        // --- UPDATE TEXT ---
         if (distanceText != null)
-        {
             distanceText.text = $"Distance to Port: {currentDistance:F0}m";
-        }
 
-        // --- UPDATE SLIDER ---
         if (distanceSlider != null)
         {
             float fraction = 1f - Mathf.Clamp01(currentDistance / maxScoreDistance);
@@ -68,11 +59,8 @@ public class GameManager : MonoBehaviour
             distanceSlider.value = curvedValue;
         }
 
-        // --- CHECK WIN CONDITION ---
         if (currentDistance <= winDistanceThreshold)
-        {
             GameWon();
-        }
     }
 
     public void GameWon()
@@ -83,7 +71,7 @@ public class GameManager : MonoBehaviour
         if (winnerPanel != null)
         {
             winnerPanel.SetActive(true);
-            Time.timeScale = 0f; // Freeze game
+            Time.timeScale = 0f;
         }
 
         Debug.Log("GAME WON: Port Reached!");
@@ -103,6 +91,7 @@ public class GameManager : MonoBehaviour
 
             Time.timeScale = 0f;
         }
+
         Debug.Log($"GAME OVER: {reason}");
     }
 

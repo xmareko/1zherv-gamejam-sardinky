@@ -9,35 +9,35 @@ public class WindSystem : MonoBehaviour
     public float maxStrength = 1.0f;
 
     [Header("Hold Durations")]
-    [Tooltip("Jak dlouho držet stejný směr větru (sekundy).")]
+    [Tooltip("How long to keep the same wind direction (seconds).")]
     public float dirHoldSeconds = 20f;
 
-    [Tooltip("Jak dlouho držet stejnou sílu větru (sekundy).")]
+    [Tooltip("How long to keep the same wind strength (seconds).")]
     public float strengthHoldSeconds = 10f;
 
     [Header("Direction Step Change")]
-    [Tooltip("Min/max velikost změny směru při přepnutí (stupně).")]
+    [Tooltip("Min/max direction step when switching target (degrees).")]
     public float dirStepMinDeg = 10f;
 
-    [Tooltip("Min/max velikost změny směru při přepnutí (stupně).")]
+    [Tooltip("Min/max direction step when switching target (degrees).")]
     public float dirStepMaxDeg = 160f;
 
     [Header("Direction Behavior (legacy fields)")]
-    [Tooltip("Základní (převládající) směr větru. (teď se používá jen jako start)")]
+    [Tooltip("Baseline wind direction (used only as start).")]
     [Range(0f, 360f)] public float baseDirDeg = 0f;
 
-    [Tooltip("Max odchylka od base směru (±). (už se nepoužívá)")]
+    [Tooltip("Legacy (unused).")]
     [Range(0f, 180f)] public float dirSwingDeg = 90f;
 
-    [Tooltip("Jak rychle se aktuální směr točí k cíli (deg/s).")]
+    [Tooltip("How fast direction turns toward target (deg/s).")]
     public float dirTurnRateDegPerSec = 20f;
 
     [Header("Change Behavior (Perlin Noise)")]
-    public float dirNoiseSpeed = 0.15f;       // (už se nepoužívá pro směr, nechávám kvůli Inspectoru)
+    public float dirNoiseSpeed = 0.15f;
     public float strengthNoiseSpeed = 0.12f;
 
     [Header("Strength Change")]
-    [Tooltip("Jak rychle se síla větru mění k cíli (za sekundu).")]
+    [Tooltip("How fast strength moves toward target (per second).")]
     public float strengthChangePerSec = 0.25f;
 
     [Header("Debug / Tuning")]
@@ -61,7 +61,6 @@ public class WindSystem : MonoBehaviour
         dirSeed = Random.Range(0f, 1000f);
         strengthSeed = Random.Range(0f, 1000f);
 
-        // start
         currentDirDeg = Wrap360(baseDirDeg);
         targetDirDeg = currentDirDeg;
         dirTimer = 0f;
@@ -85,7 +84,7 @@ public class WindSystem : MonoBehaviour
         float t = Time.time;
         float dt = Time.deltaTime;
 
-        // --- Direction: pick new target every dirHoldSeconds ---
+        // Pick a new direction target every dirHoldSeconds, then rotate toward it
         dirTimer -= dt;
         if (dirTimer <= 0f)
         {
@@ -96,11 +95,10 @@ public class WindSystem : MonoBehaviour
             float sign = Random.value < 0.5f ? -1f : 1f;
 
             targetDirDeg = Wrap360(currentDirDeg + sign * step);
-
             dirTimer = Mathf.Max(0.1f, dirHoldSeconds);
         }
 
-        // --- Strength: pick new target every strengthHoldSeconds ---
+        // Pick a new strength target every strengthHoldSeconds, then move toward it
         strengthTimer -= dt;
         if (strengthTimer <= 0f)
         {
@@ -110,7 +108,6 @@ public class WindSystem : MonoBehaviour
             strengthTimer = Mathf.Max(0.1f, strengthHoldSeconds);
         }
 
-        // --- Smoothly move to targets ---
         currentDirDeg = MoveAngle360(currentDirDeg, targetDirDeg, dirTurnRateDegPerSec * dt);
         currentStrength = Mathf.MoveTowards(currentStrength, targetStrength, strengthChangePerSec * dt);
 

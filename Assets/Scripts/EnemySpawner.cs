@@ -2,24 +2,24 @@ using UnityEngine;
 
 public class EnemySpawner : MonoBehaviour
 {
-    public Transform shipTarget;           // ShipRoot
-    public ShipDamageManager damageManager; // ShipDamageManager na ShipRoot
-    public GameObject enemyPrefab;         // prefab nepřítele
+    public Transform shipTarget;
+    public ShipDamageManager damageManager;
+    public GameObject enemyPrefab;
 
     [Header("Spawn")]
     public float spawnRadius = 14f;
     public float spawnInterval = 4f;
     public int maxAlive = 6;
 
-    public Transform worldContent; // přetáhni WorldContent v Inspectoru
+    // Parent transform for all spawned enemies
+    public Transform worldContent;
 
-    
     int alive;
     float timer;
 
     void Start()
     {
-        // fallback auto-find
+        // Auto-find ship if not assigned
         if (shipTarget == null)
         {
             var ship = FindFirstObjectByType<ShipController>();
@@ -38,12 +38,11 @@ public class EnemySpawner : MonoBehaviour
         if (timer > 0f) return;
 
         timer = spawnInterval;
-
         if (alive >= maxAlive) return;
 
         Spawn();
     }
-    
+
     void Spawn()
     {
         float a = Random.Range(0f, 360f) * Mathf.Deg2Rad;
@@ -62,12 +61,16 @@ public class EnemySpawner : MonoBehaviour
         alive++;
         go.AddComponent<OnDestroyedCallback>().Init(() => alive--);
     }
-
 }
 
 public class OnDestroyedCallback : MonoBehaviour
 {
     System.Action onDestroyed;
+
     public void Init(System.Action a) => onDestroyed = a;
-    void OnDestroy() => onDestroyed?.Invoke();
+
+    void OnDestroy()
+    {
+        onDestroyed?.Invoke();
+    }
 }

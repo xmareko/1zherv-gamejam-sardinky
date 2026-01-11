@@ -4,23 +4,24 @@ using UnityEngine.InputSystem;
 public class WorldMover : MonoBehaviour
 {
     [Header("References")]
-    public ShipController ship;   // ShipRoot s ShipControllerem
+    public ShipController ship;
 
     [Header("Forward Movement")]
     public bool useDynamicSpeed = true;
-    public float forwardSpeed = 5f;  // použije se jen když useShipSpeed=false
+    public float forwardSpeed = 5f;
 
     [Header("Sailing Model")]
     public float maxSpeed = 8f;
-    public float accel = 1.5f;       // jak rychle loď zrychluje/brzdí
-    public float noGoZoneDeg = 90f;  // úhel proti větru, kde skoro nejede
+    public float accel = 1.5f;
+    public float noGoZoneDeg = 90f;
 
-    // Pivot: střed lodi (loď je fixně na (0,0,0))
-    private readonly Vector3 pivotPoint = Vector3.zero;
+    // Ship is fixed at origin; the world rotates around this pivot
+    readonly Vector3 pivotPoint = Vector3.zero;
 
     void Update()
     {
         if (ship == null) return;
+
         if (Keyboard.current == null)
         {
             MoveForward(Time.deltaTime);
@@ -29,7 +30,7 @@ public class WorldMover : MonoBehaviour
 
         float dt = Time.deltaTime;
 
-        // 1) HELM INPUT (jen když někdo drží kormidlo)
+        // Helm input is only read while a player is assigned to the helm
         if (ship.helmsman != null)
         {
             float steerInput = ReadLeftRight(ship.helmsman.isPlayerOne);
@@ -40,15 +41,14 @@ public class WorldMover : MonoBehaviour
             ship.AutoCenterHelm(dt);
         }
 
-        // 2) SAILS INPUT (jen když někdo ovládá plachty)
-        // Pozn.: je OK, že používají stejné klávesy, protože PlayerController je při obsluze vypnutý.
+        // Sails input is only read while a player is assigned to sails
         if (ship.sailOperator != null)
         {
             float sailInput = ReadLeftRight(ship.sailOperator.isPlayerOne);
             ship.UpdateSailsFromInput(-sailInput, dt);
         }
-        
-        // 2.5) CANNONS INPUT (jen když někdo ovládá dělo)
+
+        // Cannon rotation uses the same left/right input as helm/sails
         if (ship.leftCannonOperator != null && ship.leftCannon != null)
         {
             float input = ReadLeftRight(ship.leftCannonOperator.isPlayerOne);
@@ -66,8 +66,8 @@ public class WorldMover : MonoBehaviour
             float input = ReadLeftRight(ship.frontCannonOperator.isPlayerOne);
             ship.frontCannon.Rotate(-input, dt);
         }
-        
-        // 2.6) CANNONS FIRE
+
+        // Cannon fire is gated by operator ownership
         if (ship.leftCannonOperator != null && ship.leftCannonShooter != null)
         {
             if (WasFirePressed(ship.leftCannonOperator.isPlayerOne))
@@ -86,31 +86,23 @@ public class WorldMover : MonoBehaviour
                 ship.frontCannonShooter.Shoot();
         }
 
-
-
-        // 3) TURN: otáčení světa podle kormidla (stavového)
+        // Rotate the world based on helm state and keep ship heading in sync
         float rotationAmount = ship.helm * ship.turnPerHelmUnit * dt;
         transform.RotateAround(pivotPoint, Vector3.forward, rotationAmount);
 
-        // drž logický kurz lodi
         ship.headingDeg -= rotationAmount;
         ship.headingDeg = Wrap180(ship.headingDeg);
 
-        // 4) SPEED from wind + sails
+        // Speed is driven by wind direction/strength and current sail trim
         float targetSpeed = ComputeTargetSpeed();
         ship.speed = Mathf.MoveTowards(ship.speed, targetSpeed, accel * dt);
 
-        // 5) FORWARD: svět vždy teče doleva po obrazovce
+        // World scroll gives the illusion of forward movement
         MoveForward(dt);
-
-        // Debug (můžeš smazat)
-        // if (Time.frameCount % 60 == 0)
-        //     Debug.Log($"windDir={ship.windDirDeg:F0} windStr={ship.windStrength:F2} trim={ship.sailTrim:F2} speed={ship.speed:F2} helm={ship.helm:F2}");
     }
 
     float ReadLeftRight(bool isPlayerOne)
     {
-        // P1 = A/D, P2 = šipky
         if (isPlayerOne)
         {
             return (Keyboard.current.dKey.isPressed ? 1f : 0f) -
@@ -131,41 +123,36 @@ public class WorldMover : MonoBehaviour
 
     float ComputeTargetSpeed()
     {
-        // směr lodi ve světě
-        float shipRad = ship.headingDeg * Mathf.Deg2Rad;
-        Vector2 shipDir = new Vector2(Mathf.Cos(shipRad), Mathf.Sin(shipRad));
+        Vector2 shipDir = new Vector2(
+            Mathf.Cos(ship.headingDeg * Mathf.Deg2Rad),
+            Mathf.Sin(ship.headingDeg * Mathf.Deg2Rad)
+        );
 
-        // Pokud windDirDeg znamená ODKUD vítr fouká (FROM),
-        // tak směr KAM fouká (TO) je +180°
+        // Wind "to" direction is opposite of "from" direction
         float windToDeg = ship.windDirDeg + 180f;
-        float windRad = windToDeg * Mathf.Deg2Rad;
-        Vector2 windDir = new Vector2(Mathf.Cos(windRad), Mathf.Sin(windRad));
+        Vector2 windDir = new Vector2(
+            Mathf.Cos(windToDeg * Mathf.Deg2Rad),
+            Mathf.Sin(windToDeg * Mathf.Deg2Rad)
+        );
 
-        // úhel mezi lodí a větrem (0..180)
-        // 0°  = vítr fouká stejným směrem jako loď (tailwind - dobré)
-        // 180° = vítr fouká proti lodi (headwind - špatné)
         float angle = Vector2.Angle(shipDir, windDir);
 
-        // OPRAVA: pointing má být 1 při tailwind (0°) a 0 při headwind (180°)
-        // noGoZoneDeg tady ber jako "od kdy to začíná být fakt špatné" směrem k headwind.
+        // Tailwind (0°) => 1, headwind (180°) => 0
         float pointing = 1f - Mathf.InverseLerp(noGoZoneDeg, 180f, angle);
         pointing = Mathf.Clamp01(pointing);
 
-        // trim plachet: chceme trim podle strany větru
         float crossZ = Vector3.Cross(shipDir, windDir).z;
 
-        // Pokud vítr jde přesně před/za (cross ~ 0), ideální trim je 0 (plachty "na střed")
         float desiredTrim = 0f;
         if (Mathf.Abs(crossZ) >= 0.001f)
-            desiredTrim = Mathf.Sign(crossZ); // -1 nebo +1
+            desiredTrim = Mathf.Sign(crossZ);
 
-        float trimError = Mathf.Abs(desiredTrim - ship.sailTrim); // 0..2
-        float trimFactor = 1f - Mathf.Clamp01(trimError / 2f);    // 1..0
+        float trimError = Mathf.Abs(desiredTrim - ship.sailTrim);
+        float trimFactor = 1f - Mathf.Clamp01(trimError / 2f);
 
-        float baseSpeed = 0.2f; // minimální drift
+        float baseSpeed = 0.2f;
         return baseSpeed + maxSpeed * ship.windStrength * pointing * trimFactor;
     }
-
 
     float Wrap180(float deg)
     {
@@ -173,16 +160,15 @@ public class WorldMover : MonoBehaviour
         while (deg < -180f) deg += 360f;
         return deg;
     }
-    
+
     bool WasFirePressed(bool isPlayerOne)
     {
         if (Keyboard.current == null) return false;
 
-        // P1: Space, P2: Enter
+        // P1: W, P2: UpArrow (matches your current bindings)
         if (isPlayerOne)
             return Keyboard.current.wKey.wasPressedThisFrame;
         else
             return Keyboard.current.upArrowKey.wasPressedThisFrame;
     }
-
 }

@@ -13,23 +13,17 @@ public class PlayerInteractor : MonoBehaviour
     {
         if (current == null) return;
 
-        if (WasInteractPressed())
-        {
-            if (current.CanInteract(this))
-            {
-                current.Interact(this);
-            }
-        }
+        if (WasInteractPressed() && current.CanInteract(this))
+            current.Interact(this);
     }
 
     bool WasInteractPressed()
     {
         if (Keyboard.current == null) return false;
 
-        if (isPlayerOne)
-            return Keyboard.current.eKey.wasPressedThisFrame;
-        else
-            return Keyboard.current.rightShiftKey.wasPressedThisFrame;
+        return isPlayerOne
+            ? Keyboard.current.eKey.wasPressedThisFrame
+            : Keyboard.current.rightShiftKey.wasPressedThisFrame;
     }
 
     void OnTriggerEnter2D(Collider2D other)
@@ -40,7 +34,6 @@ public class PlayerInteractor : MonoBehaviour
         current = interactable;
         currentCol = other;
 
-        // debug
         Debug.Log($"{name} entered: {interactable.Prompt}");
     }
 
@@ -48,7 +41,6 @@ public class PlayerInteractor : MonoBehaviour
     {
         if (other != currentCol) return;
 
-        // debug
         Debug.Log($"{name} exit interactable");
 
         current = null;

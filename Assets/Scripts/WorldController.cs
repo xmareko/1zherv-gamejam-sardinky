@@ -1,4 +1,4 @@
-    using UnityEngine;
+using UnityEngine;
 
 public class WorldController : MonoBehaviour
 {
@@ -12,13 +12,13 @@ public class WorldController : MonoBehaviour
 
         float dt = Time.deltaTime;
 
-        // Pivot drž ve středu lodi (loď je fixně na 0,0)
+        // Keep pivot centered on the ship (ship stays at origin)
         worldPivot.position = Vector3.zero;
 
-        // Otáčej pivot kolem lodi
+        // Rotate the world around the ship based on heading
         worldPivot.rotation = Quaternion.Euler(0, 0, -ship.headingDeg);
 
-        
+        // Move world content to simulate forward ship movement
         worldContent.position -= Vector3.right * (ship.speed * dt);
     }
 }

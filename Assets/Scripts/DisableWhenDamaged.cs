@@ -15,15 +15,15 @@ public class DisableWhenDamaged : MonoBehaviour
     [Header("Damage Source")]
     public DamagePoint damagePoint;
 
-    [Header("When HEALTHY (not damaged)")]
-    public Collider2D[] collidersHealthy;     // interakční triggry (helm/sails/cannon)
-    public Behaviour[] behavioursHealthy;     // HelmInteractable, SailsInteractable, ...
+    [Header("When HEALTHY")]
+    public Collider2D[] collidersHealthy;
+    public Behaviour[] behavioursHealthy;
 
-    [Header("When DAMAGED (repair mode)")]
-    public Collider2D[] collidersDamaged;     // repair triggry (defaultně vypnuté)
-    public Behaviour[] behavioursDamaged;     // RepairPointInteractable (volitelné)
+    [Header("When DAMAGED")]
+    public Collider2D[] collidersDamaged;
+    public Behaviour[] behavioursDamaged;
 
-    [Header("Force release (kick player out)")]
+    [Header("Force release")]
     public ShipController ship;
     public ForcedReleaseMode releaseMode = ForcedReleaseMode.None;
 
@@ -42,7 +42,7 @@ public class DisableWhenDamaged : MonoBehaviour
         bool damaged = damagePoint.isDamaged;
         if (damaged == lastDamaged) return;
 
-        // nově se poškodilo -> vyhoď hráče z obsluhy
+        // Kick player out when becoming damaged
         if (damaged)
             ForceReleaseIfNeeded();
 
@@ -52,11 +52,9 @@ public class DisableWhenDamaged : MonoBehaviour
 
     void ApplyState(bool damaged)
     {
-        // zdravé = interakce ON, opravy OFF
         SetEnabled(collidersHealthy, !damaged);
         SetEnabled(behavioursHealthy, !damaged);
 
-        // poškozené = opravy ON, interakce OFF
         SetEnabled(collidersDamaged, damaged);
         SetEnabled(behavioursDamaged, damaged);
     }
@@ -82,13 +80,15 @@ public class DisableWhenDamaged : MonoBehaviour
         switch (releaseMode)
         {
             case ForcedReleaseMode.Helm:
-                if (ship.helmsman != null) ship.ClearHelmsman(ship.helmsman);
+                if (ship.helmsman != null)
+                    ship.ClearHelmsman(ship.helmsman);
                 break;
 
             case ForcedReleaseMode.Sails:
-                if (ship.sailOperator != null) ship.ClearSailOperator(ship.sailOperator);
+                if (ship.sailOperator != null)
+                    ship.ClearSailOperator(ship.sailOperator);
                 break;
-            
+
             case ForcedReleaseMode.CannonLeft:
                 if (ship.leftCannonOperator != null)
                     ship.ClearCannonOperator(CannonSlot.Left, ship.leftCannonOperator);
