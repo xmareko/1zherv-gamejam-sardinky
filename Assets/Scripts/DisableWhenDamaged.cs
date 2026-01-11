@@ -4,7 +4,10 @@ public enum ForcedReleaseMode
 {
     None,
     Helm,
-    Sails
+    Sails,
+    CannonLeft,
+    CannonRight,
+    CannonFront
 }
 
 public class DisableWhenDamaged : MonoBehaviour
@@ -84,6 +87,21 @@ public class DisableWhenDamaged : MonoBehaviour
 
             case ForcedReleaseMode.Sails:
                 if (ship.sailOperator != null) ship.ClearSailOperator(ship.sailOperator);
+                break;
+            
+            case ForcedReleaseMode.CannonLeft:
+                if (ship.leftCannonOperator != null)
+                    ship.ClearCannonOperator(CannonSlot.Left, ship.leftCannonOperator);
+                break;
+
+            case ForcedReleaseMode.CannonRight:
+                if (ship.rightCannonOperator != null)
+                    ship.ClearCannonOperator(CannonSlot.Right, ship.rightCannonOperator);
+                break;
+
+            case ForcedReleaseMode.CannonFront:
+                if (ship.frontCannonOperator != null)
+                    ship.ClearCannonOperator(CannonSlot.Front, ship.frontCannonOperator);
                 break;
         }
     }

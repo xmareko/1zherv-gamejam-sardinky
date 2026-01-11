@@ -47,6 +47,46 @@ public class WorldMover : MonoBehaviour
             float sailInput = ReadLeftRight(ship.sailOperator.isPlayerOne);
             ship.UpdateSailsFromInput(sailInput, dt);
         }
+        
+        // 2.5) CANNONS INPUT (jen když někdo ovládá dělo)
+        if (ship.leftCannonOperator != null && ship.leftCannon != null)
+        {
+            float input = ReadLeftRight(ship.leftCannonOperator.isPlayerOne);
+            ship.leftCannon.Rotate(-input, dt);
+        }
+
+        if (ship.rightCannonOperator != null && ship.rightCannon != null)
+        {
+            float input = ReadLeftRight(ship.rightCannonOperator.isPlayerOne);
+            ship.rightCannon.Rotate(-input, dt);
+        }
+
+        if (ship.frontCannonOperator != null && ship.frontCannon != null)
+        {
+            float input = ReadLeftRight(ship.frontCannonOperator.isPlayerOne);
+            ship.frontCannon.Rotate(-input, dt);
+        }
+        
+        // 2.6) CANNONS FIRE
+        if (ship.leftCannonOperator != null && ship.leftCannonShooter != null)
+        {
+            if (WasFirePressed(ship.leftCannonOperator.isPlayerOne))
+                ship.leftCannonShooter.Shoot();
+        }
+
+        if (ship.rightCannonOperator != null && ship.rightCannonShooter != null)
+        {
+            if (WasFirePressed(ship.rightCannonOperator.isPlayerOne))
+                ship.rightCannonShooter.Shoot();
+        }
+
+        if (ship.frontCannonOperator != null && ship.frontCannonShooter != null)
+        {
+            if (WasFirePressed(ship.frontCannonOperator.isPlayerOne))
+                ship.frontCannonShooter.Shoot();
+        }
+
+
 
         // 3) TURN: otáčení světa podle kormidla (stavového)
         float rotationAmount = ship.helm * ship.turnPerHelmUnit * dt;
@@ -133,4 +173,16 @@ public class WorldMover : MonoBehaviour
         while (deg < -180f) deg += 360f;
         return deg;
     }
+    
+    bool WasFirePressed(bool isPlayerOne)
+    {
+        if (Keyboard.current == null) return false;
+
+        // P1: Space, P2: Enter
+        if (isPlayerOne)
+            return Keyboard.current.spaceKey.wasPressedThisFrame;
+        else
+            return Keyboard.current.enterKey.wasPressedThisFrame;
+    }
+
 }

@@ -25,6 +25,20 @@ public class ShipController : MonoBehaviour
     public float helmReturnPerSec = 0.2f; // 0 = nikdy se nevrací
     public float turnPerHelmUnit = 25f;   // deg/sec při helm=1
 
+    [Header("Cannons")]
+    public PlayerInteractor leftCannonOperator;
+    public PlayerInteractor rightCannonOperator;
+    public PlayerInteractor frontCannonOperator;
+
+    public CannonController leftCannon;
+    public CannonController rightCannon;
+    public CannonController frontCannon;
+    
+    public CannonShooter leftCannonShooter;
+    public CannonShooter rightCannonShooter;
+    public CannonShooter frontCannonShooter;
+
+
     [Header("Ship State")]
     public float headingDeg = 0f; // logický kurz (pro kompas/vítr)
     public float speed = 2f;      // aktuální rychlost (počítá WorldMover)
@@ -58,6 +72,76 @@ public class ShipController : MonoBehaviour
         if (sailOperator != interactor) return;
         EnablePlayerMove(interactor);
         sailOperator = null;
+    }
+
+    // ---------- Cannons ownership ----------
+    public PlayerInteractor GetCannonOperator(CannonSlot slot)
+    {
+        switch (slot)
+        {
+            case CannonSlot.Left: return leftCannonOperator;
+            case CannonSlot.Right: return rightCannonOperator;
+            case CannonSlot.Front: return frontCannonOperator;
+        }
+        return null;
+    }
+
+    public void SetCannonOperator(CannonSlot slot, PlayerInteractor interactor, CannonController cannon)
+    {
+        switch (slot)
+        {
+            case CannonSlot.Left:
+                leftCannonOperator = interactor;
+                if (cannon != null) leftCannon = cannon;
+                break;
+
+            case CannonSlot.Right:
+                rightCannonOperator = interactor;
+                if (cannon != null) rightCannon = cannon;
+                break;
+
+            case CannonSlot.Front:
+                frontCannonOperator = interactor;
+                if (cannon != null) frontCannon = cannon;
+                break;
+        }
+
+        DisablePlayerMove(interactor);
+    }
+
+    public void ClearCannonOperator(CannonSlot slot, PlayerInteractor interactor)
+    {
+        switch (slot)
+        {
+            case CannonSlot.Left:
+                if (leftCannonOperator != interactor) return;
+                EnablePlayerMove(interactor);
+                leftCannonOperator = null;
+                return;
+
+            case CannonSlot.Right:
+                if (rightCannonOperator != interactor) return;
+                EnablePlayerMove(interactor);
+                rightCannonOperator = null;
+                return;
+
+            case CannonSlot.Front:
+                if (frontCannonOperator != interactor) return;
+                EnablePlayerMove(interactor);
+                frontCannonOperator = null;
+                return;
+        }
+    }
+
+    // Volitelné: když chceš hráče "odhlásit" ze všech stanovišť najednou
+    public void ClearAllStations(PlayerInteractor interactor)
+    {
+        if (helmsman == interactor) ClearHelmsman(interactor);
+        if (sailOperator == interactor) ClearSailOperator(interactor);
+
+        if (leftCannonOperator == interactor) ClearCannonOperator(CannonSlot.Left, interactor);
+        if (rightCannonOperator == interactor) ClearCannonOperator(CannonSlot.Right, interactor);
+        if (frontCannonOperator == interactor) ClearCannonOperator(CannonSlot.Front, interactor);
     }
 
     // ---------- Helm & sails state updates ----------
