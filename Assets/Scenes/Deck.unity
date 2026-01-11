@@ -3388,6 +3388,7 @@ GameObject:
   - component: {fileID: 977204213}
   - component: {fileID: 977204212}
   - component: {fileID: 977204214}
+  - component: {fileID: 977204215}
   m_Layer: 0
   m_Name: GameManager
   m_TagString: Untagged
@@ -3408,7 +3409,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::GameManager
   destinationTarget: {fileID: 1107659613}
-  gameOverPanel: {fileID: 1644425344}
+  gameOverPanel: {fileID: 0}
   gameOverReasonText: {fileID: 661500740}
   winnerPanel: {fileID: 1353182160}
   distanceSlider: {fileID: 1146262263}
@@ -3459,6 +3460,24 @@ MonoBehaviour:
   freezeWind: 0
   fixedDirDeg: 0
   fixedStrength: 1
+--- !u!114 &977204215
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 977204211}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a3c3e60d6b1078647a118a0e86b64440, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::EnemySpawner
+  shipTarget: {fileID: 2107439601}
+  damageManager: {fileID: 2107439603}
+  enemyPrefab: {fileID: 5176079461763109121, guid: d7724ccacf2e39742bd6636911724343, type: 3}
+  spawnRadius: 14
+  spawnInterval: 10
+  maxAlive: 5
 --- !u!1 &993854171
 GameObject:
   m_ObjectHideFlags: 0
@@ -7993,7 +8012,7 @@ MonoBehaviour:
   - {fileID: 1965716588}
   - {fileID: 1565165713}
   - {fileID: 879225322}
-  autoDamageForTest: 1
+  autoDamageForTest: 0
   damageEvery: 5
 --- !u!114 &2107439604
 MonoBehaviour:
