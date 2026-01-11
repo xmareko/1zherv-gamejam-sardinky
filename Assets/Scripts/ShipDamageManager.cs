@@ -27,6 +27,9 @@ public class ShipDamageManager : MonoBehaviour
     {
         if (points.Count == 0) return;
 
+        // sound
+        SimpleAudio.Instance.PlayDamage();
+
         // Pick a random point that is not already damaged
         var candidates = points.FindAll(p => p != null && !p.isDamaged);
         if (candidates.Count == 0) return;

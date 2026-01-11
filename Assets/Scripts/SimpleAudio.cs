@@ -12,6 +12,7 @@ public class SimpleAudio : MonoBehaviour
     public AudioClip shootClip;
     public AudioClip winClip;
     public AudioClip gameOverClip;
+    public AudioClip damageClip;
 
     [Header("Settings")]
     public float currentWindSpeed;
@@ -47,5 +48,10 @@ public class SimpleAudio : MonoBehaviour
     public void PlayGameOver()
     {
         sfxSource.PlayOneShot(gameOverClip);
+    }
+
+    public void PlayDamage()
+    {
+        sfxSource.PlayOneShot(damageClip);
     }
 }

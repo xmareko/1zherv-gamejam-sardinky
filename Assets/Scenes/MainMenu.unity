@@ -1652,6 +1652,7 @@ MonoBehaviour:
   shootClip: {fileID: 8300000, guid: 64394b78270d3ef4bbfb55b04212d9a3, type: 3}
   winClip: {fileID: 8300000, guid: d08685126ff310f4baa8f8775a1ed7bc, type: 3}
   gameOverClip: {fileID: 8300000, guid: 560b405ce56c16d48a8d6fa086687894, type: 3}
+  damageClip: {fileID: 8300000, guid: aa37c3a9696c368449b874de1cf7bc17, type: 3}
   currentWindSpeed: 0
 --- !u!1 &1737266255
 GameObject:
