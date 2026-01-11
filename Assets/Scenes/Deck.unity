@@ -3409,7 +3409,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::GameManager
   destinationTarget: {fileID: 1107659613}
-  gameOverPanel: {fileID: 0}
+  gameOverPanel: {fileID: 1644425344}
   gameOverReasonText: {fileID: 661500740}
   winnerPanel: {fileID: 1353182160}
   distanceSlider: {fileID: 1146262263}
