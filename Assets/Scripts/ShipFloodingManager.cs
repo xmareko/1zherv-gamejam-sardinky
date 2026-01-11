@@ -98,10 +98,10 @@ public class ShipFloodingManager : MonoBehaviour
         isSunk = true;
         Debug.Log("Ship has sunk!");
 
-        // Trigger the Game Over screen via GameManager
         if (GameManager.Instance != null)
         {
-            GameManager.Instance.GameOver();
+            // Pass the specific reason here
+            GameManager.Instance.GameOver("The ship has sunk into the depths!");
         }
     }
 

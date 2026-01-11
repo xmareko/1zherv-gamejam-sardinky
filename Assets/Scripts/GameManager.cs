@@ -1,35 +1,42 @@
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using TMPro; // Add this namespace for TextMeshPro
 
 public class GameManager : MonoBehaviour
 {
     public static GameManager Instance;
 
     [Header("UI References")]
-    public GameObject gameOverPanel; // Assign your Game Over UI panel here
+    public GameObject gameOverPanel;
+    public TextMeshProUGUI gameOverReasonText; // Drag your new "ReasonText" here in Inspector
 
     void Awake()
     {
-        // Simple Singleton pattern
         if (Instance == null) Instance = this;
         else Destroy(gameObject);
     }
 
-    public void GameOver()
+    // UPDATED: Now requires a reason string
+    public void GameOver(string reason)
     {
         if (gameOverPanel != null)
         {
             gameOverPanel.SetActive(true);
-            // Optional: Stop time so the ship stops sinking
+
+            // Set the reason text if assigned
+            if (gameOverReasonText != null)
+            {
+                gameOverReasonText.text = reason;
+            }
+
             Time.timeScale = 0f;
         }
-        Debug.Log("GAME OVER");
+        Debug.Log($"GAME OVER: {reason}");
     }
 
-    // Connect this to the "Return to Main Menu" button on your Game Over screen
     public void ReturnToMenu()
     {
-        Time.timeScale = 1f; // Reset time before leaving
+        Time.timeScale = 1f;
         SceneManager.LoadScene("MainMenu");
     }
 
