@@ -11,6 +11,9 @@ public class EnemySpawner : MonoBehaviour
     public float spawnInterval = 4f;
     public int maxAlive = 6;
 
+    public Transform worldContent; // přetáhni WorldContent v Inspectoru
+
+    
     int alive;
     float timer;
 
@@ -40,14 +43,14 @@ public class EnemySpawner : MonoBehaviour
 
         Spawn();
     }
-
+    
     void Spawn()
     {
         float a = Random.Range(0f, 360f) * Mathf.Deg2Rad;
         Vector3 offset = new Vector3(Mathf.Cos(a), Mathf.Sin(a), 0f) * spawnRadius;
         Vector3 pos = shipTarget.position + offset;
 
-        var go = Instantiate(enemyPrefab, pos, Quaternion.identity);
+        var go = Instantiate(enemyPrefab, pos, Quaternion.identity, worldContent);
 
         var ai = go.GetComponent<EnemyShipAI>();
         if (ai != null)
@@ -59,6 +62,7 @@ public class EnemySpawner : MonoBehaviour
         alive++;
         go.AddComponent<OnDestroyedCallback>().Init(() => alive--);
     }
+
 }
 
 public class OnDestroyedCallback : MonoBehaviour
