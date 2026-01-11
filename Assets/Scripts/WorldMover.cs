@@ -180,9 +180,9 @@ public class WorldMover : MonoBehaviour
 
         // P1: Space, P2: Enter
         if (isPlayerOne)
-            return Keyboard.current.spaceKey.wasPressedThisFrame;
+            return Keyboard.current.wKey.wasPressedThisFrame;
         else
-            return Keyboard.current.enterKey.wasPressedThisFrame;
+            return Keyboard.current.upArrowKey.wasPressedThisFrame;
     }
 
 }
