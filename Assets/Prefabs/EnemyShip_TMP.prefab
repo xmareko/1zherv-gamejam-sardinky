@@ -173,7 +173,7 @@ MonoBehaviour:
   shipTarget: {fileID: 0}
   shipDamageManager: {fileID: 0}
   moveSpeed: 2
-  canBeOutrun: 0
+  canBeOutrun: 1
   worldMover: {fileID: 0}
   extraWorldDrag: 0
   useTriggerHit: 1
