@@ -78,13 +78,17 @@ public class WindSystem : MonoBehaviour
         {
             ship.windDirDeg = fixedDirDeg;
             ship.windStrength = fixedStrength;
+
+            if (SimpleAudio.Instance != null)
+            {
+                SimpleAudio.Instance.currentWindSpeed = fixedStrength * 100f;
+            }
             return;
         }
 
         float t = Time.time;
         float dt = Time.deltaTime;
 
-        // Pick a new direction target every dirHoldSeconds, then rotate toward it
         dirTimer -= dt;
         if (dirTimer <= 0f)
         {
@@ -98,7 +102,6 @@ public class WindSystem : MonoBehaviour
             dirTimer = Mathf.Max(0.1f, dirHoldSeconds);
         }
 
-        // Pick a new strength target every strengthHoldSeconds, then move toward it
         strengthTimer -= dt;
         if (strengthTimer <= 0f)
         {
@@ -113,6 +116,11 @@ public class WindSystem : MonoBehaviour
 
         ship.windDirDeg = currentDirDeg;
         ship.windStrength = currentStrength;
+
+        if (SimpleAudio.Instance != null)
+        {
+            SimpleAudio.Instance.currentWindSpeed = currentStrength * 100f;
+        }
     }
 
     static float MoveAngle360(float current, float target, float maxDelta)

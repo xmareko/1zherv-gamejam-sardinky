@@ -68,6 +68,9 @@ public class GameManager : MonoBehaviour
         if (gameEnded) return;
         gameEnded = true;
 
+        // sound
+        SimpleAudio.Instance.PlayWin();
+
         if (winnerPanel != null)
         {
             winnerPanel.SetActive(true);

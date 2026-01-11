@@ -152,8 +152,6 @@ MonoBehaviour:
   compass: {fileID: 0}
   spawnPoints:
   - {x: 100, y: 100, z: 0}
-  - {x: 100, y: 300, z: 0}
-  - {x: -100, y: 0, z: 0}
 --- !u!4 &147999
 Transform:
   m_ObjectHideFlags: 0

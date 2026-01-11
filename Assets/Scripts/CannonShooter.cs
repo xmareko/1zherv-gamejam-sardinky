@@ -30,6 +30,9 @@ public class CannonShooter : MonoBehaviour
     {
         if (!CanShoot()) return;
 
+        // boom
+        SimpleAudio.Instance.PlayShoot();
+
         // Consume loaded state
         loaded = false;
         SetLoadedVisual(false);

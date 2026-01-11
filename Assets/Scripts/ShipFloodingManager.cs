@@ -83,6 +83,9 @@ public class ShipFloodingManager : MonoBehaviour
     {
         isSunk = true;
 
+        // sound
+        SimpleAudio.Instance.PlayGameOver();
+
         if (GameManager.Instance != null)
             GameManager.Instance.GameOver("The ship has sunk into the depths!");
     }
