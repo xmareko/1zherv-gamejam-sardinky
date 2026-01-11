@@ -1,27 +1,34 @@
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using TMPro;
-using UnityEngine.UI; // Required for Slider
+using UnityEngine.UI;
 
 public class GameManager : MonoBehaviour
 {
     public static GameManager Instance;
 
     [Header("Game References")]
-    public Transform destinationTarget; // Drag your "DestinationPort" object here
+    public Transform destinationTarget;
 
     [Header("UI References")]
     public GameObject gameOverPanel;
     public TextMeshProUGUI gameOverReasonText;
 
-    [Header("Score UI")]
-    public Slider distanceSlider;       // Drag your UI Slider here
-    public TextMeshProUGUI distanceText; // Drag text for "500m left"
+    [Header("Winner UI")]
+    public GameObject winnerPanel; // Assign the new Winner Panel here
 
-    [Header("Score Settings")]
-    public float maxScoreDistance = 1000f; // Distances above this show 0% progress
-    [Tooltip("1 = Linear. 2 = Quadratic (Bar fills slowly at first, fast at the end).")]
+    [Header("Score UI")]
+    public Slider distanceSlider;
+    public TextMeshProUGUI distanceText;
+
+    [Header("Settings")]
+    public float maxScoreDistance = 1000f;
+    [Tooltip("1 = Linear. 2 = Quadratic.")]
     public float progressCurveExponent = 2.0f;
+    [Tooltip("Distance at which the game is won.")]
+    public float winDistanceThreshold = 15f;
+
+    private bool gameEnded = false; // Prevents double triggers (Win + Die same time)
 
     void Awake()
     {
@@ -29,29 +36,19 @@ public class GameManager : MonoBehaviour
         else Destroy(gameObject);
     }
 
-    public void GameOver(string reason)
+    void Update()
     {
-        if (gameOverPanel != null)
+        // Calculate distance and update slider every frame
+        if (!gameEnded)
         {
-            gameOverPanel.SetActive(true);
-
-            // 1. Show Reason
-            if (gameOverReasonText != null)
-                gameOverReasonText.text = reason;
-
-            // 2. Calculate Distance Score
-            CalculateDistanceScore();
-
-            Time.timeScale = 0f;
+            CalculateDistanceAndCheckWin();
         }
-        Debug.Log($"GAME OVER: {reason}");
     }
 
-    void CalculateDistanceScore()
+    void CalculateDistanceAndCheckWin()
     {
         float currentDistance = 0f;
 
-        // Ship is always at (0,0,0), so distance is just the magnitude of destination position
         if (destinationTarget != null)
         {
             currentDistance = destinationTarget.position.magnitude;
@@ -60,22 +57,53 @@ public class GameManager : MonoBehaviour
         // --- UPDATE TEXT ---
         if (distanceText != null)
         {
-            // Format to 0 decimal places (e.g., "Distance: 450m")
             distanceText.text = $"Distance to Port: {currentDistance:F0}m";
         }
 
-        // --- UPDATE SLIDER (Non-Linear) ---
+        // --- UPDATE SLIDER ---
         if (distanceSlider != null)
         {
-            // 1. Calculate linear fraction (0 = at max distance, 1 = at destination)
             float fraction = 1f - Mathf.Clamp01(currentDistance / maxScoreDistance);
-
-            // 2. Apply "Clever" Curve
-            // Raising to power of 2 makes the bar fill slower initially, emphasizing the final stretch.
             float curvedValue = Mathf.Pow(fraction, progressCurveExponent);
-
             distanceSlider.value = curvedValue;
         }
+
+        // --- CHECK WIN CONDITION ---
+        if (currentDistance <= winDistanceThreshold)
+        {
+            GameWon();
+        }
+    }
+
+    public void GameWon()
+    {
+        if (gameEnded) return;
+        gameEnded = true;
+
+        if (winnerPanel != null)
+        {
+            winnerPanel.SetActive(true);
+            Time.timeScale = 0f; // Freeze game
+        }
+
+        Debug.Log("GAME WON: Port Reached!");
+    }
+
+    public void GameOver(string reason)
+    {
+        if (gameEnded) return;
+        gameEnded = true;
+
+        if (gameOverPanel != null)
+        {
+            gameOverPanel.SetActive(true);
+
+            if (gameOverReasonText != null)
+                gameOverReasonText.text = reason;
+
+            Time.timeScale = 0f;
+        }
+        Debug.Log($"GAME OVER: {reason}");
     }
 
     public void ReturnToMenu()
