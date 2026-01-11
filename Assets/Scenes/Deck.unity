@@ -202,7 +202,7 @@ SpriteRenderer:
   m_GlobalIlluminationMeshLod: 0
   m_SortingLayerID: 0
   m_SortingLayer: 0
-  m_SortingOrder: 10
+  m_SortingOrder: 2
   m_MaskInteraction: 0
   m_Sprite: {fileID: 21300000, guid: 505cfa0b4e02a844ea6d457c75f126ac, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
@@ -3234,7 +3234,7 @@ SpriteRenderer:
   m_GlobalIlluminationMeshLod: 0
   m_SortingLayerID: 0
   m_SortingLayer: 0
-  m_SortingOrder: 10
+  m_SortingOrder: 2
   m_MaskInteraction: 0
   m_Sprite: {fileID: 21300000, guid: 505cfa0b4e02a844ea6d457c75f126ac, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
@@ -3464,6 +3464,7 @@ GameObject:
   m_Component:
   - component: {fileID: 977204213}
   - component: {fileID: 977204212}
+  - component: {fileID: 977204214}
   m_Layer: 0
   m_Name: GameManager
   m_TagString: Untagged
@@ -3507,6 +3508,29 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &977204214
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 977204211}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a8b2eac431d17a24896ef73af1897f30, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::WindSystem
+  ship: {fileID: 2107439602}
+  minStrength: 0.3
+  maxStrength: 1
+  baseDirDeg: 90
+  dirSwingDeg: 180
+  dirTurnRateDegPerSec: 20
+  dirNoiseSpeed: 0.2
+  strengthNoiseSpeed: 0.1
+  freezeWind: 0
+  fixedDirDeg: 0
+  fixedStrength: 1
 --- !u!1 &993854171
 GameObject:
   m_ObjectHideFlags: 0
@@ -5360,7 +5384,7 @@ SpriteRenderer:
   m_GlobalIlluminationMeshLod: 0
   m_SortingLayerID: 0
   m_SortingLayer: 0
-  m_SortingOrder: 10
+  m_SortingOrder: 2
   m_MaskInteraction: 0
   m_Sprite: {fileID: 21300000, guid: 505cfa0b4e02a844ea6d457c75f126ac, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
