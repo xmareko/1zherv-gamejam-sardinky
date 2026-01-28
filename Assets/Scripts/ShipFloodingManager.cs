@@ -10,6 +10,13 @@ public class ShipFloodingManager : MonoBehaviour
     [Range(0f, 1f)]
     public float water01 = 0f;
 
+    // --- NEW PROPERTIES ADDED HERE ---
+    // These allow external scripts (like WaterLevelVisuals) to read the data 
+    // without knowing the internal variable name 'water01'.
+    public float currentWaterLevel => water01;
+    public float maxWaterLevel => 1.0f;
+    // ---------------------------------
+
     [Tooltip("How much water is added instantly by a new hit (cannon/hull/steering).")]
     public float hitAdd = 0.04f;
 
@@ -84,7 +91,8 @@ public class ShipFloodingManager : MonoBehaviour
         isSunk = true;
 
         // sound
-        SimpleAudio.Instance.PlayGameOver();
+        if (SimpleAudio.Instance != null)
+            SimpleAudio.Instance.PlayGameOver();
 
         if (GameManager.Instance != null)
             GameManager.Instance.GameOver("The ship has sunk into the depths!");

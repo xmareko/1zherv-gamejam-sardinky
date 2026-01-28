@@ -6,8 +6,19 @@ public class PlayerInteractor : MonoBehaviour
 {
     public bool isPlayerOne = true;
 
+    [Header("Visuals")]
+    [Tooltip("The GameObject (child of this player) that represents the held tool.")]
+    public GameObject heldToolVisual;
+
     IInteractable current;
     Collider2D currentCol;
+
+    void Start()
+    {
+        // Ensure the tool is hidden when the game starts
+        if (heldToolVisual != null)
+            heldToolVisual.SetActive(false);
+    }
 
     void Update()
     {
@@ -25,6 +36,14 @@ public class PlayerInteractor : MonoBehaviour
             ? Keyboard.current.eKey.wasPressedThisFrame
             : Keyboard.current.rightShiftKey.wasPressedThisFrame;
     }
+
+    // --- NEW METHOD ---
+    public void SetHoldingTool(bool holding)
+    {
+        if (heldToolVisual != null)
+            heldToolVisual.SetActive(holding);
+    }
+    // ------------------
 
     void OnTriggerEnter2D(Collider2D other)
     {

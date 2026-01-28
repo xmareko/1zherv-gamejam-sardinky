@@ -7,7 +7,7 @@ public class RepairToolPickup : MonoBehaviour, IInteractable
     public static PlayerInteractor toolOwner;
 
     [Header("Visual")]
-    public GameObject toolVisual;
+    public GameObject toolVisual; // The tool sitting on the table/shelf
 
     void Awake()
     {
@@ -26,7 +26,10 @@ public class RepairToolPickup : MonoBehaviour, IInteractable
     {
         if (toolOwner == null)
         {
+            // Player TAKES the tool
             toolOwner = interactor;
+            interactor.SetHoldingTool(true); // Show in hands
+
             Debug.Log($"{interactor.name} took the REPAIR TOOL");
             UpdateVisual();
             return;
@@ -34,7 +37,10 @@ public class RepairToolPickup : MonoBehaviour, IInteractable
 
         if (toolOwner == interactor)
         {
+            // Player RETURNS the tool
+            interactor.SetHoldingTool(false); // Hide in hands
             toolOwner = null;
+
             Debug.Log($"{interactor.name} returned the REPAIR TOOL");
             UpdateVisual();
             return;
@@ -45,6 +51,7 @@ public class RepairToolPickup : MonoBehaviour, IInteractable
 
     void UpdateVisual()
     {
+        // Show the tool on the table only if nobody owns it
         if (toolVisual != null)
             toolVisual.SetActive(toolOwner == null);
     }
