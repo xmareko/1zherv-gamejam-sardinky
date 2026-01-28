@@ -32,7 +32,8 @@ public class SimpleAudio : MonoBehaviour
 
     void Update()
     {
-        windSource.volume = Mathf.Clamp01(currentWindSpeed / 100f);
+        float linearVal = Mathf.Clamp01(currentWindSpeed / 100f);
+        windSource.volume = linearVal * linearVal;
     }
 
     public void PlayShoot()
