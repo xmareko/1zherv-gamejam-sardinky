@@ -6,26 +6,62 @@ public class PlayerInteractor : MonoBehaviour
 {
     public bool isPlayerOne = true;
 
+    [Header("UI")]
+    public InteractHintUI hintUI;
+
     [Header("Visuals")]
     [Tooltip("The GameObject (child of this player) that represents the held tool.")]
     public GameObject heldToolVisual;
 
     IInteractable current;
     Collider2D currentCol;
+    PlayerController pc;
+
+    void Awake()
+    {
+        pc = GetComponent<PlayerController>();
+    }
 
     void Start()
     {
-        // Ensure the tool is hidden when the game starts
         if (heldToolVisual != null)
             heldToolVisual.SetActive(false);
+
+        if (hintUI != null)
+            hintUI.Hide();
     }
 
     void Update()
     {
         if (current == null) return;
 
+        RefreshHint();
+
         if (WasInteractPressed() && current.CanInteract(this))
             current.Interact(this);
+    }
+
+    void RefreshHint()
+    {
+        if (hintUI == null) return;
+
+        // If player movement is disabled, they are operating something (helm/sails/cannon/repair)
+        if (pc != null && !pc.enabled)
+        {
+            hintUI.Hide();
+            return;
+        }
+
+        if (currentCol == null)
+        {
+            hintUI.Hide();
+            return;
+        }
+
+        if (current.CanInteract(this))
+            hintUI.Show(currentCol.transform, isPlayerOne);
+        else
+            hintUI.Hide();
     }
 
     bool WasInteractPressed()
@@ -37,13 +73,11 @@ public class PlayerInteractor : MonoBehaviour
             : Keyboard.current.rightShiftKey.wasPressedThisFrame;
     }
 
-    // --- NEW METHOD ---
     public void SetHoldingTool(bool holding)
     {
         if (heldToolVisual != null)
             heldToolVisual.SetActive(holding);
     }
-    // ------------------
 
     void OnTriggerEnter2D(Collider2D other)
     {
@@ -53,16 +87,17 @@ public class PlayerInteractor : MonoBehaviour
         current = interactable;
         currentCol = other;
 
-        Debug.Log($"{name} entered: {interactable.Prompt}");
+        RefreshHint();
     }
 
     void OnTriggerExit2D(Collider2D other)
     {
         if (other != currentCol) return;
 
-        Debug.Log($"{name} exit interactable");
-
         current = null;
         currentCol = null;
+
+        if (hintUI != null)
+            hintUI.Hide();
     }
 }

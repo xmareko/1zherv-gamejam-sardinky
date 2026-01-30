@@ -1,5 +1,4 @@
 using UnityEngine;
-using UnityEngine.InputSystem;
 
 public class RepairPointInteractable : MonoBehaviour, IInteractable
 {
@@ -8,22 +7,25 @@ public class RepairPointInteractable : MonoBehaviour, IInteractable
     public DamagePoint point;
     public float repairTime = 2.0f;
 
+    [Header("Visual")]
+    public GameObject repairIndicator;
+
     float timer;
     PlayerInteractor repairingPlayer;
-    bool ignoreCancelThisFrame;
 
     void Awake()
     {
         if (point == null) point = GetComponent<DamagePoint>();
+
+        if (repairIndicator != null)
+            repairIndicator.SetActive(false);
     }
 
     public bool CanInteract(PlayerInteractor interactor)
     {
         if (point == null) return false;
 
-        // Allow the active repairing player to cancel
         if (repairingPlayer == interactor) return true;
-
         if (!point.isDamaged) return false;
         if (RepairToolPickup.toolOwner != interactor) return false;
         if (repairingPlayer != null && repairingPlayer != interactor) return false;
@@ -49,7 +51,8 @@ public class RepairPointInteractable : MonoBehaviour, IInteractable
 
         repairingPlayer = interactor;
         timer = 0f;
-        ignoreCancelThisFrame = true;
+
+        SetRepairVisual(true);
 
         LockMovement(repairingPlayer, true);
         Debug.Log($"{repairingPlayer.name} started repairing {point.name}");
@@ -75,11 +78,19 @@ public class RepairPointInteractable : MonoBehaviour, IInteractable
 
     void FinishRepair()
     {
+        SetRepairVisual(false);
+
         if (repairingPlayer != null)
             LockMovement(repairingPlayer, false);
 
         repairingPlayer = null;
         timer = 0f;
+    }
+
+    void SetRepairVisual(bool active)
+    {
+        if (repairIndicator != null)
+            repairIndicator.SetActive(active);
     }
 
     void LockMovement(PlayerInteractor player, bool locked)

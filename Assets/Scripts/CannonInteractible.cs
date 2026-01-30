@@ -21,13 +21,19 @@ public class CannonInteractable : MonoBehaviour, IInteractable
             Debug.LogError("CannonInteractable: CannonController not found!");
     }
 
-    public bool CanInteract(PlayerInteractor interactor) => ship != null && cannon != null;
+    public bool CanInteract(PlayerInteractor interactor)
+    {
+        if (ship == null || cannon == null) return false;
+
+        var current = ship.GetCannonOperator(slot);
+        if (current == null) return true;
+        return current == interactor;
+    }
 
     public void Interact(PlayerInteractor interactor)
     {
         if (ship == null || cannon == null) return;
 
-        // Release if the same player is already operating this cannon
         if (ship.GetCannonOperator(slot) == interactor)
         {
             ship.ClearCannonOperator(slot, interactor);
@@ -35,7 +41,6 @@ public class CannonInteractable : MonoBehaviour, IInteractable
             return;
         }
 
-        // Prevent takeover by another player
         var current = ship.GetCannonOperator(slot);
         if (current != null && current != interactor)
         {
@@ -43,7 +48,6 @@ public class CannonInteractable : MonoBehaviour, IInteractable
             return;
         }
 
-        // Prevent control conflicts
         if (ship.helmsman == interactor)
         {
             Debug.Log("You are at the HELM. Another player must handle the CANNON.");
@@ -55,7 +59,6 @@ public class CannonInteractable : MonoBehaviour, IInteractable
             return;
         }
 
-        // Player cannot operate multiple cannons at once
         if (ship.leftCannonOperator == interactor ||
             ship.rightCannonOperator == interactor ||
             ship.frontCannonOperator == interactor)

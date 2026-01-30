@@ -13,13 +13,17 @@ public class SailsInteractable : MonoBehaviour, IInteractable
             Debug.LogError("SailsInteractable: ShipController not found!");
     }
 
-    public bool CanInteract(PlayerInteractor interactor) => ship != null;
+    public bool CanInteract(PlayerInteractor interactor)
+    {
+        if (ship == null) return false;
+        if (ship.sailOperator == null) return true;
+        return ship.sailOperator == interactor;
+    }
 
     public void Interact(PlayerInteractor interactor)
     {
         if (ship == null) return;
 
-        // Release if the same player is already operating sails
         if (ship.sailOperator == interactor)
         {
             ship.ClearSailOperator(interactor);
@@ -27,14 +31,12 @@ public class SailsInteractable : MonoBehaviour, IInteractable
             return;
         }
 
-        // Prevent takeover by another player
         if (ship.sailOperator != null && ship.sailOperator != interactor)
         {
             Debug.Log("Sails already taken!");
             return;
         }
 
-        // Prevent helm + sails control conflict
         if (ship.helmsman == interactor)
         {
             Debug.Log("You are at the HELM. Another player must handle SAILS.");

@@ -13,13 +13,17 @@ public class HelmInteractable : MonoBehaviour, IInteractable
             Debug.LogError("HelmInteractable: ShipController not found in parents!");
     }
 
-    public bool CanInteract(PlayerInteractor interactor) => ship != null;
+    public bool CanInteract(PlayerInteractor interactor)
+    {
+        if (ship == null) return false;
+        if (ship.helmsman == null) return true;
+        return ship.helmsman == interactor;
+    }
 
     public void Interact(PlayerInteractor interactor)
     {
         if (ship == null) return;
 
-        // Release if the same player is already helmsman
         if (ship.helmsman == interactor)
         {
             ship.ClearHelmsman(interactor);
@@ -27,14 +31,12 @@ public class HelmInteractable : MonoBehaviour, IInteractable
             return;
         }
 
-        // Prevent takeover by another player
         if (ship.helmsman != null && ship.helmsman != interactor)
         {
             Debug.Log("Helm is already taken!");
             return;
         }
 
-        // Prevent helm + sails control conflict
         if (ship.sailOperator == interactor)
         {
             Debug.Log("You are handling SAILS. Another player must take the HELM.");
