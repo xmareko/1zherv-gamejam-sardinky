@@ -13,6 +13,7 @@ public class GameManager : MonoBehaviour
     [Header("UI References")]
     public GameObject gameOverPanel;
     public TextMeshProUGUI gameOverReasonText;
+    public GameObject hintsRoot;
 
     [Header("Winner UI")]
     public GameObject winnerPanel;
@@ -68,6 +69,10 @@ public class GameManager : MonoBehaviour
         if (gameEnded) return;
         gameEnded = true;
 
+        // hide ui
+        if (hintsRoot != null)
+            hintsRoot.SetActive(false);
+
         // sound
         SimpleAudio.Instance.PlayWin();
 
@@ -84,6 +89,10 @@ public class GameManager : MonoBehaviour
     {
         if (gameEnded) return;
         gameEnded = true;
+
+        // hide ui
+        if (hintsRoot != null)
+            hintsRoot.SetActive(false);
 
         if (gameOverPanel != null)
         {
